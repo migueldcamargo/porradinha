@@ -441,10 +441,14 @@ button { font: inherit; color: inherit; }
   color: var(--navy); background: #fff; transform: rotate(-3deg);
   box-shadow: 1.2cqw 1.2cqw 0 var(--orange);
 }
-.sc-phrase { margin-top: 5cqw; padding: 2cqw 3.6cqw; border-radius: 3cqw; background: rgba(13,24,48,.92); font-size: 4.6cqw; font-weight: 900; line-height: 1.25; max-width: 96%; }
 .sc-foot { width: 100%; }
-.sc-post { display: inline-block; padding: 1.2cqw 4cqw; border-radius: 2cqw; background: var(--navy); font-family: var(--display); font-size: 6.4cqw; letter-spacing: .5cqw; }
-.sc-tag { display: inline-block; margin-top: 1.6cqw; padding: .6cqw 2.4cqw; border-radius: 99px; background: rgba(13,24,48,.9); font-size: 3.6cqw; font-weight: 800; color: #fff; }
+/* discreto: só um convite pequeno, sem disputar com o número */
+.sc-post {
+  display: inline-block; padding: .5cqw 2.6cqw;
+  border: .35cqw solid rgba(255,255,255,.55); border-radius: 99px;
+  font-size: 3cqw; font-weight: 800; letter-spacing: .6cqw;
+  color: rgba(255,255,255,.9);
+}
 .sc-handle { margin-top: .6cqw; font-family: var(--display); font-size: 8.5cqw; letter-spacing: .2cqw; color: #fff; text-shadow: .8cqw .8cqw 0 var(--navy); }
 .sc-date { margin-top: .6cqw; font-size: 3cqw; font-weight: 800; color: rgba(255,255,255,.85); }
 .result-actions { flex: none; width: clamp(270px, calc((100dvh - 150px) * 0.5625), 430px); max-width: 100%; margin-top: 18px; }
@@ -932,11 +936,9 @@ button { font: inherit; color: inherit; }
         <div class="sc-cup" data-icon></div>
       </div>
       <div class="sc-label" id="scLabel">PORRADINHAS</div>
-      <div class="sc-phrase" id="scPhrase"></div>
     </div>
     <footer class="sc-foot">
       <div class="sc-post">POSTE NOS STORIES</div>
-      <div class="sc-tag">Poste seu resultado e marque a República Rapina</div>
       <div class="sc-sign" id="scSign"></div>
       <div class="sc-handle" id="scHandle"></div>
       <div class="sc-date" id="scDate"></div>
@@ -1031,14 +1033,6 @@ const CHECKPOINTS = {
   30: { text: "Calma aí 😳 Melhor desacelerar.", important: true, emoji: "🛑" },
   50: { text: "Esse número está muito alto. Pare, fique com seus amigos e procure a equipe da festa se precisar.", important: true, emoji: "🤝" },
 };
-
-// Frase do card final, pela quantidade total (primeira faixa em que count <= upTo).
-const RESULT_PHRASES = [
-  { upTo: 5,        text: "Hoje foi mais tranquilo." },
-  { upTo: 15,       text: "A noite rendeu 👀" },
-  { upTo: 30,       text: "Esse contador ficou alto. Vai de água agora 💧" },
-  { upTo: Infinity, text: "Esse contador ficou muito alto. Dá uma pausa e fica com seus amigos." },
-];
 
 // RANKING LOCAL / DEMO — não existe servidor nesta versão.
 // Estes nomes são só dados iniciais de demonstração; quem conta neste aparelho entra junto
@@ -1826,11 +1820,6 @@ function finishSession() {
   go("result");
 }
 
-function resultPhrase(count) {
-  const tier = RESULT_PHRASES.find((p) => count <= p.upTo) || RESULT_PHRASES[RESULT_PHRASES.length - 1];
-  return tier.text;
-}
-
 function renderResult() {
   const r = state.result;
   if (!r) return;
@@ -1842,7 +1831,6 @@ function renderResult() {
   num.textContent = r.count;
   num.classList.toggle("d3", String(r.count).length >= 3);
   $("#scLabel").textContent = r.count === 1 ? "PORRADINHA" : "PORRADINHAS";
-  $("#scPhrase").textContent = resultPhrase(r.count);
   $("#scHandle").textContent = INSTAGRAM_HANDLE;
   $("#scSign").textContent = SIGNATURE;
   $("#scDate").textContent = new Date(r.finishedAt).toLocaleDateString("pt-BR");
@@ -2483,7 +2471,7 @@ const INSTALL_GUIDES = {
     steps: [
       `Toque em ${SHARE_CHIP} na barra do Safari (no iOS mais novo ele fica dentro do ${chip("•••")}).`,
       `Role as opções e toque em ${chip("Adicionar à Tela de Início")}.`,
-      `Confirme em ${chip("Adicionar")} e abra pelo ícone do copo.`,
+      `Confirme em ${chip("Adicionar")} e abra o App.`,
     ],
   },
   "ios-chrome": {
@@ -2518,7 +2506,7 @@ const INSTALL_GUIDES = {
     steps: [
       `Toque em ${chip("⋮")} no canto superior direito.`,
       `Toque em ${chip("Instalar app")} ou ${chip("Adicionar à tela inicial")}.`,
-      `Confirme em ${chip("Instalar")} e abra pelo ícone do copo.`,
+      `Confirme em ${chip("Instalar")} e abra o App.`,
     ],
     canPrompt: true,
   },
@@ -2552,7 +2540,7 @@ const INSTALL_GUIDES = {
     steps: [
       `Abra o menu do navegador (${chip("⋮")} ou ${chip("≡")}).`,
       `Toque em ${chip("Adicionar à tela inicial")} ou ${chip("Instalar app")}.`,
-      `Confirme e abra pelo ícone do copo.`,
+      `Confirme e abra o App.`,
     ],
     note: "Não achou? Abra o link no Chrome.",
     canPrompt: true,
@@ -2600,7 +2588,7 @@ function openInstallGuide(auto) {
   openSheet({
     emoji: "📲",
     title: "COLOCA NA TELA INICIAL",
-    text: "Assim a Porradinha abre em tela cheia, igual app, direto do ícone do copo.",
+    text: "Assim a Porradinha abre em tela cheia, direto pelo App.",
     node,
     signed: true,
     kind: "install",
