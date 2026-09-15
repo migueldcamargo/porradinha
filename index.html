@@ -65,9 +65,9 @@ button { font: inherit; color: inherit; }
   overflow: hidden;
   background: var(--navy-2);
 }
-.screen::before { /* faixas diagonais inspiradas na logo */
+.screen::before { /* faixas diagonais inspiradas na logo — fixas: não acabam quando a tela rola */
   content: "";
-  position: absolute;
+  position: fixed;
   inset: 0;
   pointer-events: none;
   background:
@@ -442,12 +442,13 @@ button { font: inherit; color: inherit; }
   box-shadow: 1.2cqw 1.2cqw 0 var(--orange);
 }
 .sc-foot { width: 100%; }
-/* discreto: só um convite pequeno, sem disputar com o número */
+/* discreto: convite pequeno, mas com fundo próprio para ler em cima da faixa branca ou laranja */
 .sc-post {
-  display: inline-block; padding: .5cqw 2.6cqw;
-  border: .35cqw solid rgba(255,255,255,.55); border-radius: 99px;
+  display: inline-block; padding: .8cqw 3cqw;
+  border-radius: 99px;
+  background: rgba(13,24,48,.9);
   font-size: 3cqw; font-weight: 800; letter-spacing: .6cqw;
-  color: rgba(255,255,255,.9);
+  color: #fff;
 }
 .sc-handle { margin-top: .6cqw; font-family: var(--display); font-size: 8.5cqw; letter-spacing: .2cqw; color: #fff; text-shadow: .8cqw .8cqw 0 var(--navy); }
 .sc-date { margin-top: .6cqw; font-size: 3cqw; font-weight: 800; color: rgba(255,255,255,.85); }
@@ -475,7 +476,8 @@ button { font: inherit; color: inherit; }
    RANKING
    ===================================================================== */
 #screen-ranking { padding-bottom: 0; }
-.rank-inner { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; min-height: 100%; }
+/* flex: none — sem isso a lista era espremida na altura da tela e os botões "grudavam" no meio dela */
+.rank-inner { flex: none; width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; min-height: 100%; }
 .rank-head { display: flex; align-items: center; gap: 14px; margin: 4px 0 4px; }
 .rank-title { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(28px, 8.4vw, 38px); line-height: 1; }
 .rank-title span { color: var(--orange-2); }
@@ -519,7 +521,7 @@ button { font: inherit; color: inherit; }
 .rank-actions {
   position: sticky; bottom: 0;
   margin-top: auto;
-  padding: 26px 0 calc(var(--safe-bottom) + 14px);
+  padding: 22px 0 calc(var(--safe-bottom) + 8px);
   display: grid; gap: 12px;
   background: linear-gradient(transparent, var(--navy-2) 36%);
 }
