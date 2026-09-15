@@ -9,12 +9,13 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Porradinha">
 <title>PORRADINHA · República Rapina</title>
-<!-- Ícones (favicon, apple-touch-icon e manifest PWA) são gerados em JS a partir do desenho do copo — ver ICON -->
+<!-- Ícone do app (águia da Rapina). Hospedado: arquivos PNG + manifest. Arquivo solto: gerados em JS (setupIcons) -->
 <link rel="icon" id="favicon" href="data:,">
-<link rel="apple-touch-icon" id="appleIcon" href="data:,">
+<link rel="apple-touch-icon" id="appleIcon" href="apple-touch-icon.png">
+<link rel="manifest" id="manifestLink" href="manifest.webmanifest">
 <!-- Fonte opcional: sem internet, cai para Impact / Arial Black -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Permanent+Marker&display=swap">
 <style>
 /* =====================================================================
    PORRADINHA — estilos
@@ -29,6 +30,8 @@
   --white: #ffffff;
   --display: 'Anton', Impact, 'Arial Black', 'Helvetica Neue', system-ui, sans-serif;
   --body: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --marker: 'Permanent Marker', 'Segoe Print', 'Comic Sans MS', cursive;
+  --live: #3ee07f;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -233,8 +236,12 @@ button { font: inherit; color: inherit; }
 .cup-wrap.foamy #foam { transform: scaleY(1); opacity: 1; }
 .cup-wrap.foamy .drip { transform: scaleY(1); opacity: 1; }
 .cup-wrap.foamy .foam-inner { animation: foamWobble .5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
-#bubbles circle { opacity: 0; }
-.cup-wrap.bubbling #bubbles circle { animation: rise .8s ease-in infinite; }
+#bubbles circle { opacity: 0; animation: rise 3s ease-in infinite; }
+#bubbles circle:nth-child(2n)   { animation-duration: 3.7s; animation-delay: -1.3s; }
+#bubbles circle:nth-child(3n)   { animation-duration: 2.6s; animation-delay: -2.1s; }
+#bubbles circle:nth-child(4n+1) { animation-delay: -.7s; }
+#bubbles circle:nth-child(5n)   { animation-delay: -2.8s; }
+.cup-wrap.bubbling #bubbles circle { animation-duration: .8s; }
 .cup-wrap.ready { animation: readyPulse 2.4s ease-in-out infinite; }
 
 /* Sequência da Porradinha */
@@ -550,6 +557,174 @@ button { font: inherit; color: inherit; }
 @keyframes toastIn { from { transform: translateY(-24px) scale(.96); opacity: 0; } }
 @keyframes toastOut { to { transform: translateY(-20px); opacity: 0; } }
 
+/* =====================================================================
+   v1.1 — assinatura, senha, instalar, ranking ao vivo, filtro, vertical
+   ===================================================================== */
+.btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn:disabled:active { transform: none; }
+.start-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 20px; margin-top: 2px; }
+.link-btn {
+  appearance: none; border: 0; background: none;
+  padding: 10px 2px;
+  font-size: 15px; font-weight: 800; color: rgba(255,255,255,.8);
+  text-decoration: underline; text-decoration-color: rgba(255,143,69,.75); text-underline-offset: 5px;
+  cursor: pointer;
+}
+.role-tag {
+  display: inline-block; margin-right: 6px; padding: 2px 7px;
+  border-radius: 7px; background: #fff; color: var(--navy);
+  font-size: 11px; font-weight: 900; letter-spacing: .4px; vertical-align: 1px;
+}
+
+/* Assinatura dos recados: "Att. / O Rapineiro" em letra de caneta */
+.signature {
+  width: max-content; max-width: 100%;
+  margin: 0 6px 14px auto;
+  white-space: pre-line; text-align: right;
+  font-family: var(--marker); font-size: 19px; line-height: 1.15;
+  color: var(--orange-2);
+  transform: rotate(-3deg);
+}
+.toast-sign { margin-top: 6px; white-space: pre-line; text-align: right; font-family: var(--marker); font-size: 15px; font-weight: 400; line-height: 1.15; color: var(--orange); }
+.sc-sign { margin-top: 1.4cqw; white-space: pre-line; font-family: var(--marker); font-size: 4.3cqw; line-height: 1.1; color: #fff; transform: rotate(-3deg); text-shadow: .5cqw .5cqw 0 var(--navy); }
+
+/* Guia "instalar como app" */
+.install-browser { margin: -6px 0 12px; text-align: center; font-size: 14px; font-weight: 700; color: rgba(255,255,255,.65); }
+.install-browser b { color: var(--orange-2); }
+.install-steps { list-style: none; counter-reset: step; margin: 0 0 12px; padding: 0; display: grid; gap: 8px; }
+.install-steps li {
+  counter-increment: step;
+  display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: center;
+  padding: 12px 14px 12px 12px;
+  border-radius: 16px; background: rgba(255,255,255,.07);
+  font-size: 16px; font-weight: 700; line-height: 1.5; text-align: left;
+}
+.install-steps li::before {
+  content: counter(step);
+  display: grid; place-items: center; width: 34px; height: 34px;
+  border-radius: 50%; background: var(--orange);
+  font-family: var(--display); font-size: 18px;
+}
+.chip-ui {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 0 8px; border-radius: 8px;
+  background: #fff; color: var(--navy);
+  font-weight: 900; white-space: nowrap;
+}
+.chip-ui svg { width: 15px; height: 15px; }
+.sheet .install-note { margin: 0 0 12px; font-size: 14px; color: rgba(255,255,255,.65); }
+.install .btn { margin-bottom: 14px; }
+.install-timer { height: 6px; border-radius: 99px; background: rgba(255,255,255,.12); overflow: hidden; }
+.install-timer i { display: block; height: 100%; background: var(--orange); animation: drain 5s linear forwards; }
+
+/* Ranking ao vivo */
+.rank-sub { margin-bottom: 10px; }
+.rank-legend { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.st {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 11px; border-radius: 99px;
+  background: rgba(255,255,255,.08);
+  font-size: 13px; font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.st i, .rank-status.st-live i { flex: none; width: 9px; height: 9px; border-radius: 50%; background: var(--live); animation: livePulse 1.6s ease-out infinite; }
+.rank-status {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 5px; padding: 2px 9px;
+  border-radius: 99px;
+  font-size: 11px; font-weight: 900; letter-spacing: .6px;
+}
+.rank-status.st-live { background: rgba(62,224,127,.16); color: #a6f3c4; }
+.rank-status.st-done { background: rgba(255,255,255,.1); color: rgba(255,255,255,.75); }
+.rank-row.p1 .rank-status { background: rgba(13,24,48,.3); color: #fff; }
+.rank-pos { position: relative; }
+.rank-num { display: inline-block; }
+.rank-num.count-up { animation: countUp .8s cubic-bezier(.2,1.6,.4,1); }
+.rank-row.overtake { animation: overtake 1.2s ease-out; }
+.rank-row.overtake .rank-pos::after {
+  content: "▲"; position: absolute; left: 50%; top: -12px;
+  font-size: 15px; color: var(--live);
+  animation: upArrow 1.3s ease-out forwards;
+}
+.rank-row.is-new { animation: rowIn .5s ease-out; }
+.rank-empty {
+  padding: 26px 18px; border-radius: 18px;
+  border: 2px dashed rgba(255,255,255,.2);
+  text-align: center; font-size: 16px; font-weight: 700; line-height: 1.4; color: rgba(255,255,255,.75);
+}
+.btn-ghost.danger-ghost { color: #ff9b9b; border-color: rgba(255,120,120,.45); }
+
+/* Filtro de repúblicas */
+.rank-tools { display: flex; margin: 0 0 16px; }
+.filter-btn {
+  flex: 1; min-width: 0;
+  display: flex; align-items: center; gap: 10px;
+  min-height: 54px; padding: 0 16px;
+  border: 2px solid rgba(255,255,255,.2); border-radius: 16px;
+  background: rgba(255,255,255,.06);
+  text-align: left; cursor: pointer;
+}
+.filter-btn:active { background: rgba(255,255,255,.14); }
+.filter-btn:disabled { opacity: .5; cursor: default; }
+.filter-btn.is-filtered { border-color: var(--orange); background: rgba(255,106,19,.12); }
+.fb-label { flex: none; font-family: var(--display); font-size: 15px; letter-spacing: 1px; color: var(--orange-2); }
+.fb-value { flex: 1; min-width: 0; font-size: 16px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fb-caret { flex: none; font-size: 18px; opacity: .7; }
+.filter-quick { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.pill-btn {
+  appearance: none; min-height: 40px; padding: 0 14px;
+  border: 2px solid rgba(255,255,255,.24); border-radius: 99px; background: transparent;
+  font-size: 14px; font-weight: 800; cursor: pointer;
+}
+.pill-btn:active { background: rgba(255,255,255,.12); }
+.check-list { display: grid; gap: 8px; margin-bottom: 8px; }
+.check-row {
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  min-height: 58px; padding: 0 14px;
+  border-radius: 16px; background: rgba(255,255,255,.07);
+  cursor: pointer;
+}
+.check-row input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.check-box {
+  flex: none; width: 28px; height: 28px;
+  display: grid; place-items: center;
+  border: 2px solid rgba(255,255,255,.45); border-radius: 8px;
+  font-size: 17px; font-weight: 900; color: transparent;
+  transition: background .12s, border-color .12s;
+}
+.check-row input:checked + .check-box { background: var(--orange); border-color: var(--orange); color: #fff; }
+.check-row input:focus-visible + .check-box { outline: 3px solid #fff; outline-offset: 2px; }
+.check-label { flex: 1; min-width: 0; font-size: 17px; font-weight: 800; overflow-wrap: anywhere; }
+.check-count { flex: none; font-size: 13px; font-weight: 800; color: rgba(255,255,255,.6); font-variant-numeric: tabular-nums; }
+
+/* Aviso de celular deitado */
+.rotate-lock {
+  display: none;
+  position: fixed; inset: 0; z-index: 1000;
+  flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  padding: 20px; text-align: center;
+  background: var(--navy-2);
+}
+.is-landscape .rotate-lock { display: flex; }
+.rl-phone { position: relative; width: 46px; height: 78px; border: 5px solid #fff; border-radius: 12px; animation: rotatePhone 2s ease-in-out infinite; }
+.rl-phone::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 12px; height: 3px; margin-left: -6px; border-radius: 2px; background: #fff; }
+.rl-title { margin: 6px 0 0; font-family: var(--display); font-weight: 400; font-size: 34px; line-height: 1; text-shadow: 3px 3px 0 var(--orange); }
+.rl-text { margin: 0; font-size: 17px; font-weight: 700; color: rgba(255,255,255,.8); }
+
+@keyframes drain { from { width: 100%; } to { width: 0; } }
+@keyframes livePulse { 0% { box-shadow: 0 0 0 0 rgba(62,224,127,.7); } 100% { box-shadow: 0 0 0 8px rgba(62,224,127,0); } }
+@keyframes countUp { 0% { transform: scale(1); } 35% { transform: scale(1.75) translateY(-3px); text-shadow: 0 0 18px rgba(255,255,255,.9); } 100% { transform: scale(1); } }
+@keyframes overtake {
+  0%   { outline: 3px solid rgba(255,143,69,1); outline-offset: 0; filter: brightness(1.45); }
+  100% { outline: 3px solid rgba(255,143,69,0); outline-offset: 12px; filter: brightness(1); }
+}
+@keyframes upArrow { 0% { opacity: 0; transform: translate(-50%, 8px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -10px); } }
+@keyframes rowIn { from { opacity: 0; transform: translateX(-24px); } }
+@keyframes rotatePhone { 0%, 25% { transform: rotate(-90deg); } 60%, 100% { transform: rotate(0deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .st i, .rank-status.st-live i, .rl-phone { animation: none; }
+}
+
 /* Telas baixas (iPhone SE etc.) */
 @media (max-height: 700px) {
   .logo-sm { width: 42px; height: 42px; }
@@ -580,12 +755,17 @@ button { font: inherit; color: inherit; }
   <form class="start-wrap" id="startForm" novalidate autocomplete="off">
     <div class="logo start-logo" data-logo></div>
     <h1 class="app-title">PORRADINHA</h1>
-    <p class="tagline">Quem vai beber hoje?</p>
 
     <div class="field" id="fieldNick">
       <label for="inNick">APELIDO</label>
       <input id="inNick" name="nick" type="text" placeholder="Canhoto" maxlength="20" enterkeyhint="next" autocapitalize="words" spellcheck="false">
       <div class="field-error" id="nickError"></div>
+    </div>
+
+    <div class="field" id="fieldPass" hidden>
+      <label for="inPass">SENHA <small>(perfil com permissões)</small></label>
+      <input id="inPass" name="pass" type="password" placeholder="••••••••" maxlength="40" enterkeyhint="next" autocomplete="off" autocapitalize="off" spellcheck="false">
+      <div class="field-error" id="passError"></div>
     </div>
 
     <div class="field">
@@ -594,6 +774,10 @@ button { font: inherit; color: inherit; }
     </div>
 
     <button class="btn" type="submit">COMEÇAR</button>
+    <div class="start-links">
+      <button class="link-btn" id="startRankingLink" type="button">🏆 Ranking ao vivo</button>
+      <button class="link-btn" id="installLink" type="button">📲 Instalar como app</button>
+    </div>
   </form>
 </section>
 
@@ -605,6 +789,7 @@ button { font: inherit; color: inherit; }
       <div class="who-nick" id="mainNick">—</div>
       <div class="who-org" id="mainOrg"></div>
     </div>
+    <button class="icon-btn" id="rankingBtn" type="button" aria-label="Ranking ao vivo">🏆</button>
     <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu">☰</button>
   </header>
 
@@ -634,9 +819,10 @@ button { font: inherit; color: inherit; }
               <stop offset=".85" stop-color="#fff" stop-opacity=".12"/>
               <stop offset="1" stop-color="#fff" stop-opacity=".34"/>
             </linearGradient>
+            <clipPath id="liquidBody"><rect x="0" y="40" width="200" height="236"/></clipPath>
             <linearGradient id="liquidGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#f7f9b8"/>
-              <stop offset="1" stop-color="#cfe45a"/>
+              <stop offset="0" stop-color="#eef7ff" stop-opacity=".2"/>
+              <stop offset="1" stop-color="#bcd9ff" stop-opacity=".34"/>
             </linearGradient>
             <linearGradient id="baseGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0" stop-color="#e6eeff" stop-opacity=".45"/>
@@ -652,18 +838,24 @@ button { font: inherit; color: inherit; }
           <!-- líquido (vodka + refri de limão) -->
           <g clip-path="url(#cavityClip)">
             <g id="liquid">
-              <rect x="0" y="36" width="200" height="240" fill="url(#liquidGrad)" opacity=".92"/>
-              <ellipse cx="100" cy="36" rx="100" ry="6" fill="#fdfed8"/>
-              <g id="bubbles" fill="#fff">
-                <circle cx="50"  cy="236" r="4"   style="animation-delay:0s"/>
-                <circle cx="78"  cy="246" r="3"   style="animation-delay:.25s"/>
-                <circle cx="100" cy="240" r="5"   style="animation-delay:.1s"/>
-                <circle cx="124" cy="248" r="3.5" style="animation-delay:.4s"/>
-                <circle cx="146" cy="236" r="4"   style="animation-delay:.18s"/>
-                <circle cx="64"  cy="200" r="2.5" style="animation-delay:.55s"/>
-                <circle cx="112" cy="210" r="3"   style="animation-delay:.33s"/>
-                <circle cx="138" cy="196" r="2.5" style="animation-delay:.62s"/>
-                <circle cx="88"  cy="180" r="3"   style="animation-delay:.47s"/>
+              <!-- transparente, com bolhinhas subindo o tempo todo -->
+              <rect x="0" y="36" width="200" height="240" fill="url(#liquidGrad)"/>
+              <ellipse cx="100" cy="37" rx="100" ry="6" fill="#fff" fill-opacity=".22" stroke="#fff" stroke-opacity=".75" stroke-width="2"/>
+              <g id="bubbles" clip-path="url(#liquidBody)" fill="#fff" fill-opacity=".85">
+                <circle cx="46"  cy="242" r="3"/>
+                <circle cx="62"  cy="250" r="2"/>
+                <circle cx="78"  cy="238" r="3.5"/>
+                <circle cx="92"  cy="252" r="2.2"/>
+                <circle cx="104" cy="244" r="4"/>
+                <circle cx="118" cy="236" r="2.5"/>
+                <circle cx="130" cy="250" r="3"/>
+                <circle cx="144" cy="240" r="2"/>
+                <circle cx="152" cy="248" r="3.2"/>
+                <circle cx="70"  cy="214" r="1.8"/>
+                <circle cx="112" cy="220" r="2.4"/>
+                <circle cx="136" cy="206" r="1.8"/>
+                <circle cx="56"  cy="226" r="2.6"/>
+                <circle cx="96"  cy="200" r="1.6"/>
               </g>
             </g>
           </g>
@@ -745,6 +937,7 @@ button { font: inherit; color: inherit; }
     <footer class="sc-foot">
       <div class="sc-post">POSTE NOS STORIES</div>
       <div class="sc-tag">Poste seu resultado e marque a República Rapina</div>
+      <div class="sc-sign" id="scSign"></div>
       <div class="sc-handle" id="scHandle"></div>
       <div class="sc-date" id="scDate"></div>
     </footer>
@@ -768,19 +961,32 @@ button { font: inherit; color: inherit; }
       <div class="logo logo-sm" data-logo></div>
       <h1 class="rank-title">🏆 RANKING DA <span>PORRADINHA</span></h1>
     </div>
-    <p class="rank-sub">Resultados registrados neste dispositivo</p>
+    <p class="rank-sub" id="rankSub">Resultados registrados neste dispositivo</p>
+    <div class="rank-legend" id="rankLegend"></div>
+    <div class="rank-tools">
+      <button class="filter-btn" id="filterBtn" type="button" aria-haspopup="dialog">
+        <span class="fb-label">REPÚBLICAS</span><span class="fb-value" id="filterValue">Todas</span><span class="fb-caret" aria-hidden="true">▾</span>
+      </button>
+    </div>
     <ol class="rank-list" id="rankList"></ol>
     <div class="rank-actions">
-      <button class="btn btn-white" id="backToResultBtn" type="button">VOLTAR AO RESULTADO</button>
+      <button class="btn btn-white" id="rankBackBtn" type="button">VOLTAR AO RESULTADO</button>
       <button class="btn btn-ghost" id="endBtn" type="button">ENCERRAR</button>
+      <button class="btn btn-ghost danger-ghost" id="resetRankingBtn" type="button" hidden>🧨 ZERAR RANKING GERAL</button>
     </div>
   </div>
 </section>
 
 <!-- ============================ CAMADAS ============================ -->
 <div class="countdown" id="countdown" hidden><div class="cd-text" id="cdText">1</div></div>
+<div class="rotate-lock" role="alert">
+  <div class="rl-phone" aria-hidden="true"></div>
+  <h2 class="rl-title">VOLTA PRA VERTICAL</h2>
+  <p class="rl-text">A Porradinha só funciona com o celular em pé.</p>
+</div>
 <div id="layer"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0"></script>
 <script>
 "use strict";
 /* =====================================================================
@@ -788,12 +994,27 @@ button { font: inherit; color: inherit; }
    ===================================================================== */
 
 /* ============================== CONFIG ============================== */
-const COOLDOWN_SECONDS = 30;          // tempo mínimo entre duas Porradinhas
+const COOLDOWN_SECONDS = 15;          // tempo mínimo entre duas Porradinhas
 const UNDO_FINISH_SECONDS = 10;       // janela para "voltar a tomar" depois de finalizar
+const INSTALL_HINT_LOCK_SECONDS = 5;  // o aviso "instalar como app" só pode ser fechado depois disso
 const INSTAGRAM_HANDLE = "@rap.rapina";
+const SIGNATURE = "Att.\nO Rapineiro"; // assinatura dos recados
 const NICK_MAX = 20;
 const ORG_MAX = 30;
 const STORAGE_PREFIX = "porradinha.v1.";
+
+// SERVIDOR (Supabase). Com os dois preenchidos, o ranking é ao vivo entre todos os celulares.
+// Deixe SUPABASE_URL vazio para o modo offline (tudo só neste aparelho).
+// A chave "publishable" é pública por natureza: quem protege os dados são as regras do banco.
+const SUPABASE_URL = "https://yytosvfwfudljfvdxdok.supabase.co";
+const SUPABASE_KEY = "sb_publishable_FiKBXtk8S3vGk_q3sXdWHw_A4VjtObn";
+const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0";
+
+// PERFIS COM PERMISSÕES — chave = apelido em minúsculas e sem acento ("Tatu", "TATU", "tatu"...).
+// A senha NÃO fica aqui: é conferida no banco (função claim_admin). Sem servidor, esses perfis não entram.
+const PRIVILEGED_PROFILES = {
+  tatu: { permissions: ["resetRanking"], badge: "👑 ADMIN" },
+};
 
 // Logo real da República Rapina. Vazio = usa o desenho SVG embutido (logoSVG).
 // Pode ser um caminho ("assets/logo-rapina.png"), uma URL ou um data URL (base64)
@@ -820,30 +1041,38 @@ const RESULT_PHRASES = [
 ];
 
 // RANKING LOCAL / DEMO — não existe servidor nesta versão.
-// Estes nomes são só dados iniciais de demonstração; os resultados finalizados
-// neste aparelho são somados a eles (ver RANKING). Cada celular tem o seu ranking.
+// Estes nomes são só dados iniciais de demonstração; quem conta neste aparelho entra junto
+// (ver RANKING). Cada celular tem o seu ranking. Um admin pode zerar tudo, inclusive estes.
+// status: "drinking" = ainda tomando | "finished" = já finalizou
 const DEFAULT_RANKING = [
-  { nick: "Sanasa",  org: "Rapina", count: 35 },
-  { nick: "Corujão", org: "Rapina", count: 32 },
-  { nick: "Canhoto", org: "Rapina", count: 29 },
-  { nick: "Caras",   org: "Rapina", count: 27 },
-  { nick: "Johnny",  org: "Rapina", count: 25 },
+  { nick: "Canhoto", org: "Rapina", count: 35, status: "drinking" },
+  { nick: "Tcharas", org: "Rapina", count: 33, status: "finished" },
+  { nick: "Sanasa",  org: "Rapina", count: 31, status: "drinking" },
+  { nick: "Corujão", org: "Rapina", count: 29, status: "finished" },
+  { nick: "Johnny",  org: "Rapina", count: 27, status: "drinking" },
+  { nick: "Dinho",   org: "Rapina", count: 10, status: "finished" },
+  { nick: "Enter",   org: "Rapina", count: 2,  status: "finished" },
 ];
 
 // Durações da animação (ms)
 const TIMING = { countStep: 520, word: 720, slam: 420, shake: 300, foam: 950, drink: 1050 };
 
-const COLORS = { navy: "#16274a", navyDark: "#0d1830", orange: "#ff6a13", lemon: "#e9f27a", foam: "#fffef0" };
+const COLORS = { navy: "#16274a", navyDark: "#0d1830", orange: "#ff6a13", liquid: "#d9eeff", foam: "#fffef0", iconOrange: "#ff7b00", iconBlue: "#233a8f" };
 
 /* ============================== STATE ============================== */
 const state = {
-  profile: null,       // { nick, org }
-  session: null,       // { count, lastAt, startedAt }  — contagem em andamento
-  result: null,        // { id, nick, org, count, finishedAt } — resultado finalizado
+  profile: null,       // { nick, org, permissions }
+  session: null,       // { id, count, lastAt, startedAt } — contagem em andamento
+  result: null,        // { id, nick, org, count, lastAt, finishedAt } — resultado finalizado
   localRanking: [],    // resultados finalizados neste aparelho
+  demoHidden: false,   // true depois que um admin zera o ranking
+  rankFilter: null,    // null = todas as repúblicas; array = chaves escolhidas
+  outbox: [],          // online: gravações de contagens já encerradas que ficaram sem sinal
   screen: "start",     // start | main | result | ranking
   animating: false,
 };
+
+function newId() { return "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
 
 const $ = (sel) => document.querySelector(sel);
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -870,7 +1099,13 @@ function loadState() {
   state.result = storage.get("result", null);
   state.localRanking = storage.get("ranking", []);
   state.screen = storage.get("screen", "start");
+  state.demoHidden = storage.get("demoHidden", false) === true;
+  state.rankFilter = storage.get("rankFilter", null);
+  state.outbox = storage.get("outbox", []);
+  if (!Array.isArray(state.outbox)) state.outbox = [];
   if (!Array.isArray(state.localRanking)) state.localRanking = [];
+  if (state.rankFilter !== null && !Array.isArray(state.rankFilter)) state.rankFilter = null;
+  if (state.session && !state.session.id) state.session.id = newId();
 }
 
 function saveState() {
@@ -878,6 +1113,9 @@ function saveState() {
   storage.set("session", state.session);
   storage.set("result", state.result);
   storage.set("ranking", state.localRanking);
+  storage.set("demoHidden", state.demoHidden || null);
+  storage.set("rankFilter", state.rankFilter);
+  storage.set("outbox", state.outbox.length ? state.outbox : null);
   storage.set("screen", state.screen);
 }
 
@@ -923,7 +1161,8 @@ function iconSVG({ rounded = true, uid = "i" } = {}) {
   <ellipse cx="256" cy="452" rx="100" ry="12" fill="#000" opacity=".3"/>
   <path d="M152,160 L360,160 L334,440 Q332,452 320,452 L192,452 Q180,452 178,440 Z" fill="#fff" fill-opacity=".2"/>
   <g clip-path="url(#${uid}cav)">
-    <rect x="140" y="196" width="240" height="220" fill="${COLORS.lemon}"/>
+    <rect x="140" y="196" width="240" height="220" fill="${COLORS.liquid}" fill-opacity=".45"/>
+    <rect x="140" y="194" width="240" height="7" fill="#fff" fill-opacity=".75"/>
     <circle cx="220" cy="330" r="9" fill="#fff" opacity=".8"/><circle cx="286" cy="290" r="7" fill="#fff" opacity=".8"/><circle cx="252" cy="356" r="6" fill="#fff" opacity=".8"/>
   </g>
   <path d="M186,372 Q190,392 256,394 Q322,392 326,372 L334,440 Q332,452 320,452 L192,452 Q180,452 178,440 Z" fill="#fff" fill-opacity=".45"/>
@@ -942,50 +1181,78 @@ function mountArt() {
   document.querySelectorAll("[data-icon]").forEach((el, i) => { el.innerHTML = iconSVG({ uid: "ic" + i }); });
 }
 
-// Favicon (SVG), apple-touch-icon (PNG gerado em canvas) e manifest PWA (blob).
-function setupIcons() {
-  const svgUrl = (svg) => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
-  $("#favicon").setAttribute("href", svgUrl(iconSVG({ rounded: true, uid: "fav" })));
+// Ícone do app: cabeça de águia da República Rapina (azul) sobre laranja.
+// maskable = arte menor, com folga para o Android recortar em círculo.
+function appIconSVG({ rounded = false, maskable = false } = {}) {
+  const art = maskable ? ' transform="translate(320 320) scale(.76) translate(-316 -332)"' : "";
+  return `
+<svg viewBox="0 0 640 640" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="640" rx="${rounded ? 136 : 0}" fill="${COLORS.iconOrange}"/>
+  <g${art}>
+    <path fill="${COLORS.iconBlue}" d="M108,218 L365,218 C470,218 545,298 553,447 C536,421 503,407 452,406 L78,405 L125,352 L90,313 L137,272 Z"/>
+    <path fill="${COLORS.iconOrange}" d="M305,268 L428,268 L412,301 Z"/>
+  </g>
+</svg>`;
+}
 
-  const toPNG = (size) => new Promise((resolve) => {
+const svgUrl = (svg) => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+
+function iconCanvas(size, opts) {
+  return new Promise((resolve) => {
     const img = new Image();
     img.onload = () => {
       try {
         const c = document.createElement("canvas");
         c.width = c.height = size;
         c.getContext("2d").drawImage(img, 0, 0, size, size);
-        resolve(c.toDataURL("image/png"));
+        resolve(c);
       } catch (e) { resolve(null); }
     };
     img.onerror = () => resolve(null);
-    img.src = svgUrl(iconSVG({ rounded: false, uid: "png" }));
+    img.src = svgUrl(appIconSVG(opts));
   });
+}
 
-  Promise.all([toPNG(180), toPNG(192), toPNG(512)]).then(([p180, p192, p512]) => {
-    if (p180) $("#appleIcon").setAttribute("href", p180);
-    if (!p192 || !p512) return;
-    try {
-      const base = location.href.split("#")[0];
-      const manifest = {
-        name: "PORRADINHA · República Rapina",
-        short_name: "Porradinha",
-        start_url: base,
-        scope: base.replace(/[^/]*$/, ""),
-        display: "standalone",
-        orientation: "portrait",
-        background_color: COLORS.navyDark,
-        theme_color: COLORS.navy,
-        icons: [
-          { src: p192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
-          { src: p512, sizes: "512x512", type: "image/png", purpose: "any maskable" },
-        ],
-      };
-      const link = document.createElement("link");
-      link.rel = "manifest";
-      link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" }));
-      document.head.appendChild(link);
-    } catch (e) { /* ambiente sem Blob URL: segue sem manifest */ }
-  });
+// Favicon sempre em SVG. Hospedado (GitHub Pages): manifest e ícones vêm dos arquivos PNG.
+// Arquivo aberto solto (sem esses arquivos): gera apple-touch-icon e manifest aqui mesmo.
+function setupIcons() {
+  $("#favicon").setAttribute("href", svgUrl(appIconSVG({ rounded: true })));
+  if (/^https?:$/.test(location.protocol)) {
+    fetch("manifest.webmanifest", { method: "HEAD", cache: "no-store" })
+      .then((r) => { if (!r.ok) generateIcons(); })
+      .catch(generateIcons);
+  } else {
+    generateIcons();
+  }
+}
+
+function generateIcons() {
+  Promise.all([iconCanvas(180), iconCanvas(192), iconCanvas(512), iconCanvas(512, { maskable: true })])
+    .then(([c180, c192, c512, cMask]) => {
+      const png = (c) => { try { return c ? c.toDataURL("image/png") : null; } catch (e) { return null; } };
+      const [p180, p192, p512, pMask] = [png(c180), png(c192), png(c512), png(cMask)];
+      if (p180) $("#appleIcon").setAttribute("href", p180);
+      if (!p192 || !p512) return;
+      try {
+        const base = location.href.split("#")[0].split("?")[0];
+        const manifest = {
+          name: "PORRADINHA · República Rapina",
+          short_name: "Porradinha",
+          start_url: base,
+          scope: base.replace(/[^/]*$/, ""),
+          display: "standalone",
+          orientation: "portrait",
+          background_color: COLORS.navyDark,
+          theme_color: COLORS.navy,
+          icons: [
+            { src: p192, sizes: "192x192", type: "image/png", purpose: "any" },
+            { src: p512, sizes: "512x512", type: "image/png", purpose: "any" },
+            pMask && { src: pMask, sizes: "512x512", type: "image/png", purpose: "maskable" },
+          ].filter(Boolean),
+        };
+        $("#manifestLink").setAttribute("href", URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" })));
+      } catch (e) { /* ambiente sem Blob URL: segue sem manifest */ }
+    });
 }
 
 /* ============================== PROFILE ============================== */
@@ -993,29 +1260,130 @@ function cleanText(value, max) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, max);
 }
 
-function startSession(nick, org) {
-  state.profile = { nick, org };
-  state.session = { count: 0, lastAt: null, startedAt: Date.now() };
+function normalizeKey(value) {
+  return String(value || "").normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/\s+/g, " ").trim().toLowerCase();
+}
+
+function privilegedFor(nick) {
+  const key = normalizeKey(nick);
+  return Object.prototype.hasOwnProperty.call(PRIVILEGED_PROFILES, key) ? PRIVILEGED_PROFILES[key] : null;
+}
+
+function hasPermission(permission) {
+  const p = state.profile;
+  return !!(p && Array.isArray(p.permissions) && p.permissions.includes(permission) && privilegedFor(p.nick));
+}
+
+function profileBadge() {
+  const p = state.profile;
+  const privileged = p && privilegedFor(p.nick);
+  return privileged && Array.isArray(p.permissions) && p.permissions.length ? privileged.badge : "";
+}
+
+function showFieldError(fieldId, errorId, message) {
+  const field = $("#" + fieldId);
+  field.classList.remove("has-error");
+  void field.offsetWidth;
+  field.classList.add("has-error");
+  $("#" + errorId).textContent = message;
+}
+
+function clearFieldError(fieldId, errorId) {
+  $("#" + fieldId).classList.remove("has-error");
+  $("#" + errorId).textContent = "";
+}
+
+// Campo de senha aparece só quando o apelido digitado é de um perfil com permissões
+function syncPasswordField() {
+  const show = !!privilegedFor($("#inNick").value);
+  $("#fieldPass").hidden = !show;
+  if (!show) { $("#inPass").value = ""; clearFieldError("fieldPass", "passError"); }
+}
+
+function askPassword(nick) {
+  return openSheet({
+    emoji: "🔒", title: "SENHA",
+    text: `${nick} é um perfil com permissões. Digite a senha para continuar.`,
+    input: {
+      type: "password", placeholder: "••••••••", max: 40,
+      validate: (v) => (!v ? "Digite a senha." : null),
+      check: async (v) => { // conferida no servidor
+        if (!ONLINE) return "Esse perfil precisa de conexão com o servidor.";
+        try {
+          return (await rpc("claim_admin", { p_nick: nick, p_password: v })) ? null : "Senha incorreta. Confere e tenta de novo.";
+        } catch (e) { return friendlyError(e); }
+      },
+    },
+    buttons: [{ label: "ENTRAR", value: "ok" }, { label: "CANCELAR", value: null, style: "ghost" }],
+  }).then((res) => !!(res && res.value === "ok"));
+}
+
+function startSession(nick, org, permissions, row) {
+  state.profile = { nick, org, permissions: permissions || [] };
+  state.session = {
+    id: newId(), remoteId: row ? row.id : null, remoteSince: Date.now(),
+    count: 0, lastAt: null, startedAt: Date.now(), dirty: false,
+  };
+  if (row) server.rows.set(row.id, row);
   state.result = null;
   saveState();
   go("main");
 }
 
-function onStartSubmit(event) {
+async function onStartSubmit(event) {
   event.preventDefault();
   const nick = cleanText($("#inNick").value, NICK_MAX);
   const org = cleanText($("#inOrg").value, ORG_MAX);
-  const field = $("#fieldNick");
   if (!nick) {
-    field.classList.remove("has-error"); void field.offsetWidth; field.classList.add("has-error");
-    $("#nickError").textContent = "Coloca seu apelido pra começar.";
+    showFieldError("fieldNick", "nickError", "Coloca seu apelido pra começar.");
     $("#inNick").focus();
     return;
   }
-  field.classList.remove("has-error");
-  $("#nickError").textContent = "";
-  document.activeElement && document.activeElement.blur();
-  startSession(nick, org);
+  clearFieldError("fieldNick", "nickError");
+
+  // Perfil com permissões (ex.: Tatu) só avança com a senha certa, conferida no servidor
+  const privileged = privilegedFor(nick);
+  const pass = $("#inPass").value;
+  const passProblem = (message) => {
+    $("#fieldPass").hidden = false;
+    showFieldError("fieldPass", "passError", message);
+    $("#inPass").focus();
+  };
+  if (privileged && !pass) return passProblem(`O perfil ${nick} precisa de senha.`);
+  if (privileged && !ONLINE) return passProblem("Esse perfil precisa de conexão com o servidor.");
+  clearFieldError("fieldPass", "passError");
+
+  let row = null;
+  if (ONLINE) {
+    if (startBusy) return;
+    setStartBusy(true);
+    try {
+      if (privileged) {
+        const ok = await rpc("claim_admin", { p_nick: nick, p_password: pass });
+        if (!ok) return passProblem("Senha incorreta. Confere e tenta de novo.");
+      } else {
+        rpc("release_admin", {}).catch(() => {});
+      }
+      row = await rpc("start_participant", { p_nick: nick, p_org: org });
+    } catch (e) {
+      if (privileged) passProblem(friendlyError(e));
+      else showFieldError("fieldNick", "nickError", friendlyError(e));
+      return;
+    } finally {
+      setStartBusy(false);
+    }
+  }
+  $("#inPass").value = "";
+  if (document.activeElement) document.activeElement.blur();
+  startSession(nick, org, privileged ? privileged.permissions.slice() : [], row);
+}
+
+let startBusy = false;
+function setStartBusy(busy) {
+  startBusy = busy;
+  const btn = $("#startForm button[type=submit]");
+  btn.disabled = busy;
+  btn.textContent = busy ? "ENTRANDO…" : "COMEÇAR";
 }
 
 async function changeNick() {
@@ -1024,7 +1392,29 @@ async function changeNick() {
     input: { value: state.profile.nick, placeholder: "Canhoto", max: NICK_MAX, required: "O apelido é obrigatório." },
     buttons: [{ label: "SALVAR", value: "ok" }, { label: "CANCELAR", value: null, style: "ghost" }],
   });
-  if (res && res.value === "ok") { state.profile.nick = res.text; saveState(); renderMain(); }
+  if (!res || res.value !== "ok") return;
+  const nick = res.text;
+  const privileged = privilegedFor(nick);
+  const alreadyUnlocked = privileged && normalizeKey(nick) === normalizeKey(state.profile.nick) && profileBadge();
+  if (privileged && !alreadyUnlocked && !(await askPassword(nick))) return;
+  if (!(await pushProfile(nick, state.profile.org))) return;
+  state.profile.nick = nick;
+  state.profile.permissions = privileged ? privileged.permissions.slice() : [];
+  saveState();
+  renderMain();
+}
+
+// Online: grava apelido/república no servidor antes de trocar na tela.
+async function pushProfile(nick, org) {
+  if (!ONLINE || !state.session || !state.session.remoteId) return true;
+  try {
+    const row = await rpc("update_participant", { p_id: state.session.remoteId, p_nick: nick, p_org: org || "" });
+    if (row && row.id) server.rows.set(row.id, row);
+    return true;
+  } catch (e) {
+    toast(friendlyError(e), 3200);
+    return false;
+  }
 }
 
 async function changeOrg() {
@@ -1034,7 +1424,10 @@ async function changeOrg() {
     input: { value: state.profile.org, placeholder: "Rapina", max: ORG_MAX },
     buttons: [{ label: "SALVAR", value: "ok" }, { label: "CANCELAR", value: null, style: "ghost" }],
   });
-  if (res && res.value === "ok") { state.profile.org = res.text; saveState(); renderMain(); }
+  if (!res || res.value !== "ok" || !(await pushProfile(state.profile.nick, res.text))) return;
+  state.profile.org = res.text;
+  saveState();
+  renderMain();
 }
 
 /* ============================== COUNTER ============================== */
@@ -1047,6 +1440,7 @@ function tryDrink() {
   state.session.count += 1;
   state.session.lastAt = Date.now();
   saveState();
+  markDirty(); // online: manda para o servidor (e reenvia sozinho se estiver sem sinal)
   playPorradinha(state.session.count);
 }
 
@@ -1067,6 +1461,7 @@ async function resetCounter() {
   state.session.count = 0;
   state.session.lastAt = null;
   saveState();
+  markDirty();
   renderMain();
   setFill(1, 300);
 }
@@ -1081,11 +1476,12 @@ function cooldownLeft() { return Math.ceil(cooldownLeftMs() / 1000); }
 function cooldownProgress() { return 1 - cooldownLeftMs() / (COOLDOWN_SECONDS * 1000); }
 
 function openCooldownSheet() {
-  if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+  vibrate([30, 40, 30]);
   openSheet({
-    emoji: "🍋", title: "VAI PRO FINAL DA FILA 😅",
+    title: "VAI PRO FINAL DA FILA 😅",
     text: "Porradinha é pra todo mundo aproveitar.",
     html: `<div class="big-timer">Próxima em <b data-cooldown-left>${cooldownLeft()}</b> segundos</div>`,
+    signed: true,
     buttons: [{ label: "BELEZA", value: "ok", style: "white" }],
     kind: "cooldown",
   });
@@ -1097,7 +1493,10 @@ function tick() {
     const left = cooldownLeft();
     const btn = $("#drinkBtn");
     btn.classList.toggle("is-cooling", left > 0 || state.animating);
-    $("#coolLine").innerHTML = state.animating ? "" : left > 0 ? `Próxima em <b>${left}s</b>` : "";
+    const noSignal = ONLINE && state.session.dirty && server.offlineSince && Date.now() - server.offlineSince > 4000;
+    $("#coolLine").innerHTML = state.animating ? ""
+      : left > 0 ? `Próxima em <b>${left}s</b>${noSignal ? " · sem sinal" : ""}`
+      : noSignal ? "📶 Sem sinal: sua contagem sobe quando a internet voltar" : "";
     if (!state.animating) {
       setFill(cooldownProgress(), 300); // o copo "reenche" durante o cooldown
       $("#cupWrap").classList.toggle("ready", left === 0);
@@ -1106,6 +1505,8 @@ function tick() {
     if (left === 0 && layerKind() === "cooldown") closeSheet(null);
   }
   if (state.screen === "result") updateUndo();
+  // tempo real caiu: enquanto não volta, atualiza o ranking a cada 15 s
+  if (ONLINE && state.screen === "ranking" && !server.live && Date.now() - server.lastFetch > 15000) fetchRanking();
 }
 
 /* ============================== CHECKPOINTS ============================== */
@@ -1115,10 +1516,10 @@ function showCheckpoint(count) {
   if (cp.important) {
     openSheet({
       emoji: cp.emoji || "💧", title: `${count} PORRADINHAS`, text: cp.text,
-      buttons: [{ label: "ENTENDI", value: "ok", style: "white" }], lockBackdrop: true,
+      buttons: [{ label: "ENTENDI", value: "ok", style: "white" }], lockBackdrop: true, signed: true,
     });
   } else {
-    toast(cp.text);
+    toast(cp.text, 4200, { signed: true });
   }
 }
 
@@ -1217,21 +1618,39 @@ function openSheet(opts) {
 
     let input = null, error = null;
     if (opts.input) {
+      const isPassword = opts.input.type === "password";
       input = add("input");
-      input.type = "text";
+      input.type = isPassword ? "password" : "text";
       input.maxLength = opts.input.max || 40;
       input.value = opts.input.value || "";
       input.placeholder = opts.input.placeholder || "";
-      input.autocapitalize = "words";
+      input.autocapitalize = isPassword ? "off" : "words";
+      input.autocomplete = "off";
       input.spellcheck = false;
       error = add("div", "field-error");
     }
+    if (opts.signed) add("div", "signature", SIGNATURE);
 
-    const submit = (value) => {
+    let checking = false;
+    const submit = async (value) => {
       if (value == null) return closeSheet(null);
+      if (checking) return;
       const txt = input ? cleanText(input.value, opts.input.max || 40) : undefined;
-      if (input && opts.input.required && !txt) {
-        error.textContent = opts.input.required;
+      let problem = !input ? null
+        : opts.input.required && !txt ? opts.input.required
+        : opts.input.validate ? opts.input.validate(input.value) : null;
+      if (!problem && input && opts.input.check) { // conferência demorada (ex.: senha no servidor)
+        checking = true;
+        sheet.querySelectorAll(".actions .btn").forEach((b) => { b.disabled = true; });
+        try { problem = await opts.input.check(input.value); }
+        finally {
+          checking = false;
+          sheet.querySelectorAll(".actions .btn").forEach((b) => { b.disabled = false; });
+        }
+        if (!sheetCtx || sheetCtx.el !== overlay) return;
+      }
+      if (problem) {
+        error.textContent = problem;
         input.style.animation = "shake .35s"; setTimeout(() => (input.style.animation = ""), 360);
         input.focus();
         return;
@@ -1256,11 +1675,12 @@ function openSheet(opts) {
       input.addEventListener("input", () => { error.textContent = ""; });
     }
     overlay.addEventListener("click", (e) => {
-      if (e.target === overlay && !opts.lockBackdrop) closeSheet(null);
+      if (e.target === overlay && sheetCtx && sheetCtx.el === overlay && !sheetCtx.lockBackdrop) closeSheet(null);
     });
 
     sheetCtx = { resolve, kind: opts.kind || null, lockBackdrop: !!opts.lockBackdrop, el: overlay };
     $("#layer").appendChild(overlay);
+    if (opts.onMount) opts.onMount(sheet);
     if (input) setTimeout(() => input.focus(), 60);
   });
 }
@@ -1276,12 +1696,18 @@ function closeSheet(result) {
 function layerKind() { return sheetCtx ? sheetCtx.kind : null; }
 
 let toastTimer = null;
-function toast(message, ms = 4200) {
+function toast(message, ms = 4200, { signed = false } = {}) {
   document.querySelectorAll(".toast").forEach((t) => t.remove());
   const el = document.createElement("div");
   el.className = "toast";
   el.setAttribute("role", "status");
   el.textContent = message;
+  if (signed) {
+    const sign = document.createElement("div");
+    sign.className = "toast-sign";
+    sign.textContent = SIGNATURE;
+    el.appendChild(sign);
+  }
   const hide = () => { el.classList.add("out"); setTimeout(() => el.remove(), 260); };
   el.addEventListener("click", hide);
   document.body.appendChild(el);
@@ -1293,12 +1719,16 @@ function openMenu() {
   if (state.animating) return;
   const list = document.createElement("div");
   list.className = "menu-list";
-  [
+  const items = [
     ["✏️", "Trocar apelido", changeNick],
     ["🏠", "Alterar República / Atlética / Organização", changeOrg],
+    ["🏆", "Ranking ao vivo", () => go("ranking")],
+    ["📲", "Instalar como app", () => openInstallGuide(false)],
     ["🧽", "Zerar contador", resetCounter, "danger"],
-    ["🏁", "Finalizar por aqui", confirmFinish],
-  ].forEach(([icon, label, action, cls]) => {
+  ];
+  if (hasPermission("resetRanking")) items.push(["🧨", "Zerar ranking geral", resetRanking, "danger"]);
+  items.push(["🏁", "Finalizar por aqui", confirmFinish]);
+  items.forEach(([icon, label, action, cls]) => {
     const item = document.createElement("button");
     item.type = "button";
     item.className = "menu-item" + (cls ? " " + cls : "");
@@ -1382,15 +1812,17 @@ async function confirmFinish() {
 /* ============================== RESULT ============================== */
 function finishSession() {
   const result = {
-    id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    id: state.session.remoteId || state.session.id || newId(), // mesmo id da contagem: no ranking a linha só troca de status
     nick: state.profile.nick,
     org: state.profile.org || "",
     count: state.session.count,
+    lastAt: state.session.lastAt || 0,
     finishedAt: Date.now(),
   };
   state.result = result;
-  state.localRanking.push({ ...result }); // entra no ranking local
+  if (!ONLINE) state.localRanking.push({ ...result }); // offline: entra no ranking local
   saveState();
+  markDirty(); // online: status "finalizou" vai para o servidor
   go("result");
 }
 
@@ -1412,6 +1844,7 @@ function renderResult() {
   $("#scLabel").textContent = r.count === 1 ? "PORRADINHA" : "PORRADINHAS";
   $("#scPhrase").textContent = resultPhrase(r.count);
   $("#scHandle").textContent = INSTAGRAM_HANDLE;
+  $("#scSign").textContent = SIGNATURE;
   $("#scDate").textContent = new Date(r.finishedAt).toLocaleDateString("pt-BR");
   updateUndo();
 }
@@ -1439,22 +1872,146 @@ function undoFinish() {
   state.localRanking = state.localRanking.filter((e) => e.id !== id); // tira do ranking
   state.result = null;
   saveState();
+  markDirty(); // online: volta a "tomando" no servidor
   go("main");
   toast("Contagem reaberta de onde parou.", 2600);
 }
 
 /* ============================== RANKING ============================== */
-// RANKING LOCAL / DEMO: DEFAULT_RANKING + resultados finalizados neste aparelho.
-// Não sincroniza com ninguém — numa versão com backend, trocar getRanking() pela API.
-function getRanking() {
-  const demo = DEFAULT_RANKING.map((e, i) => ({
-    id: "demo-" + i, nick: e.nick, org: e.org || "", count: e.count, finishedAt: 0, demo: true,
+// RANKING LOCAL / DEMO: DEFAULT_RANKING + quem está contando agora neste aparelho + resultados
+// finalizados aqui. "Ao vivo" só entre abas do mesmo aparelho (evento "storage").
+// Na versão com Supabase, getRankingEntries() lê do banco e as mudanças chegam pelo tempo real.
+function getRankingEntries() {
+  if (ONLINE) return getServerRankingEntries();
+  const entries = state.demoHidden ? [] : DEFAULT_RANKING.map((e, i) => ({
+    id: "demo-" + i, nick: e.nick, org: e.org || "", count: e.count,
+    status: e.status === "drinking" ? "drinking" : "finished", lastAt: 0, demo: true,
   }));
-  const all = [...demo, ...state.localRanking].sort(
-    (a, b) => b.count - a.count || (a.finishedAt || 0) - (b.finishedAt || 0)
-  );
+  state.localRanking.forEach((e) => entries.push({
+    ...e, org: e.org || "", status: "finished", lastAt: e.lastAt || e.finishedAt || 0,
+  }));
+  if (state.profile && state.session && !state.result) {
+    entries.push({
+      id: state.session.id, nick: state.profile.nick, org: state.profile.org || "",
+      count: state.session.count, status: "drinking",
+      lastAt: state.session.lastAt || state.session.startedAt || 0,
+    });
+  }
+  return entries.sort((a, b) => b.count - a.count || a.lastAt - b.lastAt);
+}
+
+// Agrupa as repúblicas sem diferenciar maiúsculas/acentos ("Rapina" = "RAPINA").
+function getOrgOptions(entries) {
+  const map = new Map();
+  entries.forEach((e) => {
+    const key = normalizeKey(e.org);
+    if (!map.has(key)) map.set(key, { key, label: e.org || "Sem república", count: 0 });
+    map.get(key).count += 1;
+  });
+  return [...map.values()].sort((a, b) => (a.key === "") - (b.key === "") || a.label.localeCompare(b.label, "pt-BR"));
+}
+
+function selectedOrgKeys(options) {
+  return Array.isArray(state.rankFilter) ? new Set(state.rankFilter) : new Set(options.map((o) => o.key));
+}
+
+function setRankFilter(keys, options) {
+  state.rankFilter = options.every((o) => keys.has(o.key)) ? null : [...keys];
+  storage.set("rankFilter", state.rankFilter);
+  renderRanking();
+}
+
+function openFilterSheet() {
+  const options = getOrgOptions(getRankingEntries());
+  if (!options.length) return;
+  const selected = selectedOrgKeys(options);
+  const myKey = normalizeKey((state.result && state.result.org) || (state.profile && state.profile.org) || "");
+  const mine = myKey ? options.find((o) => o.key === myKey) : null;
+
+  const wrap = document.createElement("div");
+  const quick = document.createElement("div");
+  quick.className = "filter-quick";
+  const list = document.createElement("div");
+  list.className = "check-list";
+  const inputs = [];
+
+  const apply = () => setRankFilter(new Set(inputs.filter((i) => i.checked).map((i) => i.value)), options);
+  const setAll = (isOn) => { inputs.forEach((i) => { i.checked = isOn(i.value); }); apply(); };
+  const pill = (label, onClick) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "pill-btn";
+    b.textContent = label;
+    b.addEventListener("click", onClick);
+    return b;
+  };
+  quick.append(pill("Selecionar todas", () => setAll(() => true)), pill("Limpar seleção", () => setAll(() => false)));
+  if (mine) quick.append(pill(`Só a minha: ${mine.label}`, () => setAll((k) => k === myKey)));
+
+  options.forEach((o) => {
+    const row = document.createElement("label");
+    row.className = "check-row";
+    const input = document.createElement("input");
+    input.type = "checkbox";
+    input.value = o.key;
+    input.checked = selected.has(o.key);
+    input.addEventListener("change", apply);
+    const box = document.createElement("span");
+    box.className = "check-box";
+    box.textContent = "✓";
+    const label = document.createElement("span");
+    label.className = "check-label";
+    label.textContent = o.label;
+    const count = document.createElement("span");
+    count.className = "check-count";
+    count.textContent = `${o.count} ${o.count === 1 ? "pessoa" : "pessoas"}`;
+    row.append(input, box, label, count);
+    list.appendChild(row);
+    inputs.push(input);
+  });
+  wrap.append(quick, list);
+
+  openSheet({
+    title: "FILTRAR REPÚBLICAS",
+    text: "Marque as repúblicas que aparecem no ranking.",
+    node: wrap,
+    buttons: [{ label: "VER RANKING", value: "ok", style: "white" }],
+  });
+}
+
+async function resetRanking() {
+  if (!hasPermission("resetRanking")) return;
+  const total = ONLINE
+    ? getRankingEntries().length
+    : getRankingEntries().filter((e) => e.status === "finished" || e.demo).length;
+  const where = ONLINE ? "de todo mundo (inclusive a sua contagem)" : "deste aparelho";
+  const res = await openSheet({
+    emoji: "🧨", title: "ZERAR RANKING GERAL?",
+    text: total
+      ? `Apaga ${total} ${total === 1 ? "resultado" : "resultados"} ${where}, inclusive os de demonstração. O ranking recomeça do zero e não dá pra desfazer.`
+      : "O ranking já está zerado.",
+    buttons: total
+      ? [{ label: "ZERAR RANKING", value: "ok", style: "danger" }, { label: "CANCELAR", value: null, style: "ghost" }]
+      : [{ label: "OK", value: null, style: "white" }],
+  });
+  if (!res || res.value !== "ok") return;
+  if (ONLINE) {
+    try { await rpc("reset_ranking", {}); }
+    catch (e) { toast(friendlyError(e), 3200); return; }
+    server.rows.clear();
+    handleRemoteReset(true);
+  }
+  state.localRanking = [];
+  state.demoHidden = true;
+  state.rankFilter = null;
+  saveState();
+  if (state.screen === "ranking") renderRanking();
+  toast("Ranking zerado. Começando do zero.", 2600);
+}
+
+function withPositions(entries) {
   let prevCount = null, prevPos = 0;
-  return all.map((e, i) => {
+  return entries.map((e, i) => {
     const pos = e.count === prevCount ? prevPos : i + 1; // empates dividem a posição
     prevCount = e.count;
     prevPos = pos;
@@ -1464,13 +2021,53 @@ function getRanking() {
 
 const MEDALS = { 1: "🥇", 2: "🥈", 3: "🥉" };
 
-function renderRanking() {
+function renderRanking({ animate = false } = {}) {
   const list = $("#rankList");
+  const before = new Map(); // posição anterior de cada linha, para animar mudanças ao vivo
+  if (animate) {
+    list.querySelectorAll(".rank-row[data-id]").forEach((row) => {
+      before.set(row.dataset.id, { top: row.getBoundingClientRect().top, count: Number(row.dataset.count), pos: Number(row.dataset.pos) });
+    });
+  }
   list.innerHTML = "";
-  const meId = state.result ? state.result.id : null;
-  let dividerAdded = false;
+  const meId = state.session ? (state.session.remoteId || state.session.id) : null;
+  $("#rankSub").textContent = !ONLINE ? "Resultados registrados neste dispositivo"
+    : server.live ? "Ao vivo com todo mundo da festa" : "Conectando ao ranking ao vivo…";
 
-  getRanking().forEach((e) => {
+  const entries = getRankingEntries();
+  const options = getOrgOptions(entries);
+  const selected = selectedOrgKeys(options);
+  const visible = withPositions(entries.filter((e) => selected.has(normalizeKey(e.org))));
+
+  // Botão do filtro
+  const chosen = options.filter((o) => selected.has(o.key));
+  const filtered = chosen.length !== options.length;
+  $("#filterBtn").classList.toggle("is-filtered", filtered);
+  $("#filterBtn").disabled = options.length === 0;
+  $("#filterValue").textContent = options.length === 0 ? "—"
+    : !filtered ? `Todas (${options.length})`
+    : chosen.length === 0 ? "Nenhuma"
+    : chosen.length === 1 ? chosen[0].label
+    : `${chosen.length} de ${options.length}`;
+
+  // Legenda: ainda tomando x finalizaram
+  const drinking = visible.filter((e) => e.status === "drinking").length;
+  const done = visible.length - drinking;
+  $("#rankLegend").innerHTML =
+    `<span class="st"><i></i>${drinking} ainda tomando</span>` +
+    `<span class="st">🏁 ${done} ${done === 1 ? "finalizou" : "finalizaram"}</span>`;
+
+  if (!visible.length) {
+    const empty = document.createElement("li");
+    empty.className = "rank-empty";
+    empty.textContent = entries.length
+      ? "Nenhuma república selecionada. Toque em REPÚBLICAS para escolher."
+      : "Ranking zerado. Quem começar a contar aparece aqui.";
+    list.appendChild(empty);
+  }
+
+  let dividerAdded = false;
+  visible.forEach((e) => {
     if (e.pos > 3 && !dividerAdded) {
       dividerAdded = true;
       const d = document.createElement("li");
@@ -1481,6 +2078,9 @@ function renderRanking() {
     const isMe = e.id === meId;
     const li = document.createElement("li");
     li.className = "rank-row" + (e.pos <= 3 ? " p" + e.pos : "") + (isMe ? " me" : "");
+    li.dataset.id = e.id;
+    li.dataset.count = e.count;
+    li.dataset.pos = e.pos;
 
     const pos = document.createElement("div");
     pos.className = "rank-pos";
@@ -1501,11 +2101,17 @@ function renderRanking() {
       org.appendChild(tag);
     }
     org.appendChild(document.createTextNode(e.org || "—"));
-    info.append(nick, org);
+    const status = document.createElement("div");
+    status.className = "rank-status " + (e.status === "drinking" ? "st-live" : "st-done");
+    status.innerHTML = e.status === "drinking" ? "<i></i>TOMANDO" : "🏁 FINALIZOU";
+    info.append(nick, org, status);
 
     const qty = document.createElement("div");
     qty.className = "rank-qty";
-    qty.textContent = e.count;
+    const num = document.createElement("span");
+    num.className = "rank-num";
+    num.textContent = e.count;
+    qty.appendChild(num);
     const small = document.createElement("small");
     small.textContent = e.count === 1 ? "Porradinha" : "Porradinhas";
     qty.appendChild(small);
@@ -1514,11 +2120,562 @@ function renderRanking() {
     list.appendChild(li);
   });
 
-  $("#backToResultBtn").hidden = !state.result;
+  // Ao vivo: quem passou alguém desliza para cima e ganha destaque; número que subiu dá um zoom
+  if (animate) {
+    list.querySelectorAll(".rank-row[data-id]").forEach((row) => {
+      const prev = before.get(row.dataset.id);
+      if (!prev) { row.classList.add("is-new"); return; }
+      const dy = prev.top - row.getBoundingClientRect().top;
+      if (Math.abs(dy) > 1) {
+        row.style.transition = "none";
+        row.style.transform = `translateY(${dy}px)`;
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          row.style.transition = "transform .7s cubic-bezier(.2,.9,.25,1)";
+          row.style.transform = "";
+        }));
+      }
+      if (Number(row.dataset.pos) < prev.pos) row.classList.add("overtake");
+      if (Number(row.dataset.count) > prev.count) row.querySelector(".rank-num").classList.add("count-up");
+    });
+  }
+
+  $("#rankBackBtn").textContent = state.result ? "VOLTAR AO RESULTADO" : state.session ? "VOLTAR PRA CONTAGEM" : "VOLTAR";
+  $("#endBtn").hidden = !state.result;
+  $("#resetRankingBtn").hidden = !hasPermission("resetRanking");
   const me = list.querySelector(".me");
-  if (me) requestAnimationFrame(() => {
+  if (me && !animate) requestAnimationFrame(() => {
     if (me.getBoundingClientRect().bottom > window.innerHeight - 170) me.scrollIntoView({ block: "center" });
   });
+}
+
+function rankingBack() {
+  go(state.result ? "result" : state.session ? "main" : "start");
+}
+
+/* ============================== SERVER (Supabase) ============================== */
+// Cada celular entra com um login anônimo (sem cadastro). O ranking vem da tabela "participants"
+// e as mudanças chegam pelo tempo real. Gravar só pelas funções do banco (ver 01-porradinha.sql).
+const ONLINE = !!(SUPABASE_URL && SUPABASE_KEY);
+const server = {
+  client: null,
+  libPromise: null,
+  authPromise: null,
+  channel: null,
+  rows: new Map(),   // ranking vindo do banco: id → linha
+  live: false,       // tempo real conectado
+  lastFetch: 0,
+  offlineSince: 0,   // desde quando as gravações estão falhando
+};
+
+const SERVER_ERRORS = {
+  nick_reservado: "Esse apelido é de um perfil com permissões.",
+  apelido_obrigatorio: "Coloca seu apelido pra começar.",
+  aguarde: "Espera uns segundinhos e tenta de novo.",
+  sem_permissao: "Só perfil com permissões pode fazer isso.",
+  participante_nao_encontrado: "Sua contagem não está mais no ranking.",
+};
+
+function errorCode(e) { return String((e && (e.message || e.error_description || e.code)) || e || ""); }
+
+function friendlyError(e) {
+  const code = errorCode(e);
+  const known = Object.keys(SERVER_ERRORS).find((k) => code.indexOf(k) !== -1);
+  if (known) return SERVER_ERRORS[known];
+  if (/anonymous|not allowed|rate limit|too many/i.test(code)) return "O servidor recusou a entrada agora. Tenta de novo em instantes.";
+  return "Sem conexão com o servidor. Confere a internet e tenta de novo.";
+}
+
+function withTimeout(promise, ms) {
+  let timer;
+  const limit = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error("timeout")), ms); });
+  return Promise.race([promise, limit]).finally(() => clearTimeout(timer));
+}
+
+function loadSupabaseLib() {
+  if (window.supabase) return Promise.resolve();
+  if (!server.libPromise) {
+    server.libPromise = new Promise((resolve, reject) => {
+      const s = document.createElement("script");
+      s.src = SUPABASE_JS;
+      s.onload = () => (window.supabase ? resolve() : reject(new Error("sem_biblioteca")));
+      s.onerror = () => reject(new Error("sem_biblioteca"));
+      document.head.appendChild(s);
+    }).catch((e) => { server.libPromise = null; throw e; });
+  }
+  return server.libPromise;
+}
+
+function sb() {
+  if (!server.client && window.supabase) {
+    server.client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: { persistSession: true, autoRefreshToken: true, storageKey: STORAGE_PREFIX + "auth" },
+    });
+  }
+  return server.client;
+}
+
+async function ensureAuth() {
+  await loadSupabaseLib();
+  const client = sb();
+  if (!server.authPromise) {
+    server.authPromise = (async () => {
+      const { data } = await client.auth.getSession();
+      if (data && data.session) return data.session;
+      const res = await client.auth.signInAnonymously();
+      if (res.error) throw res.error;
+      return res.data.session;
+    })().catch((e) => { server.authPromise = null; throw e; });
+  }
+  return withTimeout(server.authPromise, 15000);
+}
+
+async function rpc(name, args) {
+  await ensureAuth();
+  const { data, error } = await withTimeout(sb().rpc(name, args), 15000);
+  if (error) throw error;
+  return data;
+}
+
+const parseTs = (v) => (v ? Date.parse(String(v).replace(/(\.\d{3})\d+/, "$1")) || 0 : 0);
+
+// Ranking online: linhas do banco + a minha contagem por cima (a tela nunca espera a rede).
+function getServerRankingEntries() {
+  const s = state.session;
+  const mineId = s ? s.remoteId : null;
+  const entries = [];
+  server.rows.forEach((r) => {
+    const mine = !!mineId && r.id === mineId && !!state.profile;
+    entries.push({
+      id: r.id,
+      nick: mine ? state.profile.nick : r.nick,
+      org: mine ? state.profile.org || "" : r.org || "",
+      count: mine ? s.count : r.porradinhas,
+      status: mine ? (state.result ? "finished" : "drinking") : r.status,
+      lastAt: mine ? s.lastAt || parseTs(r.created_at) : parseTs(r.last_at || r.created_at),
+      demo: !!r.is_demo,
+    });
+  });
+  if (s && state.profile && (!mineId || !server.rows.has(mineId))) {
+    entries.push({
+      id: mineId || s.id, nick: state.profile.nick, org: state.profile.org || "",
+      count: s.count, status: state.result ? "finished" : "drinking", lastAt: s.lastAt || s.startedAt || 0,
+    });
+  }
+  return entries.sort((a, b) => b.count - a.count || a.lastAt - b.lastAt);
+}
+
+async function fetchRanking() {
+  if (!ONLINE) return;
+  const startedAt = Date.now();
+  server.lastFetch = startedAt;
+  try {
+    await loadSupabaseLib();
+    const { data, error } = await withTimeout(
+      sb().from("participants")
+        .select("id,nick,org,porradinhas,status,last_at,finished_at,is_demo,created_at")
+        .order("porradinhas", { ascending: false })
+        .limit(2000),
+      15000
+    );
+    if (error) throw error;
+    server.rows = new Map(data.map((r) => [r.id, r]));
+    const s = state.session;
+    if (s && s.remoteId && !server.rows.has(s.remoteId) && (s.remoteSince || 0) < startedAt - 1000) handleRemoteReset();
+    scheduleRankingRender();
+  } catch (e) { /* sem rede: tenta de novo depois */ }
+}
+
+function subscribeRanking() {
+  if (!ONLINE || server.channel || !sb()) return;
+  server.channel = sb()
+    .channel("ranking-porradinha")
+    .on("postgres_changes", { event: "*", schema: "public", table: "participants" }, onRankingChange)
+    .subscribe((status) => {
+      const wasLive = server.live;
+      server.live = status === "SUBSCRIBED";
+      if (server.live && !wasLive) fetchRanking(); // recupera o que passou enquanto estava desconectado
+      if (wasLive !== server.live) scheduleRankingRender();
+    });
+}
+
+function onRankingChange(payload) {
+  if (payload.eventType === "DELETE") {
+    const id = payload.old && payload.old.id;
+    if (!id) return;
+    server.rows.delete(id);
+    if (state.session && state.session.remoteId === id) handleRemoteReset();
+  } else if (payload.new && payload.new.id) {
+    server.rows.set(payload.new.id, payload.new);
+  }
+  scheduleRankingRender();
+}
+
+let rankRenderTimer = null;
+function scheduleRankingRender() {
+  clearTimeout(rankRenderTimer);
+  rankRenderTimer = setTimeout(() => { if (state.screen === "ranking") renderRanking({ animate: true }); }, 120);
+}
+
+// Minha linha sumiu do banco = o admin zerou o ranking.
+function handleRemoteReset(silent) {
+  const s = state.session;
+  if (!s || !s.remoteId) return;
+  s.remoteId = null;
+  s.dirty = false;
+  if (state.result) { saveState(); return; } // já tinha finalizado: o card continua
+  s.count = 0;
+  s.lastAt = null;
+  saveState();
+  if (state.screen === "main" && !state.animating) renderMain();
+  if (!silent) toast("O ranking foi zerado pela organização. Sua contagem recomeçou do zero.", 5000, { signed: true });
+  syncSoon(500); // cria a contagem nova no servidor
+}
+
+function markDirty() {
+  if (!ONLINE || !state.session) return;
+  state.session.dirty = true;
+  saveState();
+  syncSoon();
+}
+
+let syncTimer = null, syncing = false, syncDelay = 0;
+function syncSoon(delay = 0) {
+  if (!ONLINE) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(syncNow, delay);
+}
+
+async function ensureParticipant(s) {
+  const row = await rpc("start_participant", { p_nick: state.profile.nick, p_org: state.profile.org || "" });
+  if (state.session !== s) return;
+  s.remoteId = row.id;
+  s.remoteSince = Date.now();
+  s.dirty = s.count > 0 || !!state.result;
+  server.rows.set(row.id, row);
+  saveState();
+}
+
+// Envia o que falta para o servidor. Sem sinal: tenta de novo com espera crescente (até 30 s).
+async function syncNow() {
+  if (!ONLINE || syncing) return;
+  syncing = true;
+  try {
+    while (state.outbox.length) { // contagens já encerradas que não gravaram na hora
+      try {
+        const row = await rpc("save_progress", state.outbox[0]);
+        if (row && row.id) server.rows.set(row.id, row);
+      } catch (e) {
+        if (errorCode(e).indexOf("participante_nao_encontrado") === -1) throw e;
+      }
+      state.outbox.shift();
+      saveState();
+    }
+    const s = state.session;
+    if (s && state.profile) {
+      if (!s.remoteId) await ensureParticipant(s);
+      while (state.session === s && s.remoteId && s.dirty) {
+        s.dirty = false;
+        saveState();
+        const row = await rpc("save_progress", {
+          p_id: s.remoteId, p_count: s.count, p_status: state.result ? "finished" : "drinking",
+        });
+        if (row && row.id) server.rows.set(row.id, row);
+        if (row && state.session === s && !s.dirty && row.porradinhas < s.count) {
+          s.count = row.porradinhas; // servidor não aceitou tudo (toques rápidos demais)
+          saveState();
+          if (state.screen === "main" && !state.animating) renderCounter(s.count, false);
+        }
+      }
+    }
+    server.offlineSince = 0;
+    syncDelay = 0;
+  } catch (e) {
+    if (state.session && errorCode(e).indexOf("participante_nao_encontrado") !== -1) {
+      handleRemoteReset();
+    } else {
+      if (state.session) { state.session.dirty = true; saveState(); }
+      if (!server.offlineSince) server.offlineSince = Date.now();
+      syncDelay = Math.min(30000, syncDelay ? syncDelay * 2 : 2000);
+      syncSoon(syncDelay);
+    }
+  } finally {
+    syncing = false;
+  }
+  scheduleRankingRender();
+}
+
+// Selo de admin guardado no aparelho só vale se o servidor confirmar
+async function verifyAdmin() {
+  if (!ONLINE || !state.profile || !(state.profile.permissions || []).length) return;
+  try {
+    if (!(await rpc("am_admin", {}))) {
+      state.profile.permissions = [];
+      saveState();
+      if (state.screen === "main") renderMain();
+      if (state.screen === "ranking") renderRanking();
+    }
+  } catch (e) { /* sem rede: confere na próxima */ }
+}
+
+function startServer() {
+  if (!ONLINE) return;
+  fetchRanking();
+  ensureAuth()
+    .then(() => { subscribeRanking(); syncSoon(); verifyAdmin(); })
+    .catch(() => setTimeout(startServer, 5000));
+}
+
+/* ============================== SYNC entre abas ============================== */
+// Sem servidor, o "ao vivo" funciona entre abas/janelas do mesmo aparelho.
+function onStorageSync(e) {
+  if (!e.key || e.key.indexOf(STORAGE_PREFIX) !== 0) return;
+  const key = e.key.slice(STORAGE_PREFIX.length);
+  if (!["profile", "session", "result", "ranking", "demoHidden"].includes(key)) return;
+  const screen = state.screen;
+  loadState();
+  state.screen = screen;
+  if (ONLINE) syncSoon(300);
+  if (screen === "ranking") renderRanking({ animate: true });
+  else if (screen === "main" && state.profile && state.session && !state.animating) renderMain();
+  else if (screen === "result" && state.result) renderResult();
+}
+
+/* ============================== INSTALL (tela inicial do celular) ============================== */
+let deferredInstallPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredInstallPrompt = e; });
+window.addEventListener("appinstalled", () => { deferredInstallPrompt = null; storage.set("installHintSeen", true); });
+
+function isStandalone() {
+  return matchMedia("(display-mode: standalone)").matches
+    || matchMedia("(display-mode: fullscreen)").matches
+    || window.navigator.standalone === true;
+}
+
+function detectBrowser() {
+  const ua = navigator.userAgent || "";
+  const ios = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const android = /Android/i.test(ua);
+  const inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|Line\/|Snapchat|TikTok|musical_ly|BytedanceWebview|Twitter|LinkedInApp|GSA\//i.test(ua);
+  if (ios) {
+    if (inApp) return "ios-inapp";
+    if (/CriOS/i.test(ua)) return "ios-chrome";
+    if (/FxiOS|EdgiOS|OPiOS|YaBrowser/i.test(ua)) return "ios-other";
+    return "ios-safari";
+  }
+  if (android) {
+    if (inApp || /; wv\)/.test(ua)) return "android-inapp";
+    if (/SamsungBrowser/i.test(ua)) return "android-samsung";
+    if (/Firefox/i.test(ua)) return "android-firefox";
+    if (/EdgA|OPR|Opera|YaBrowser|MiuiBrowser/i.test(ua)) return "android-other";
+    if (/Chrome/i.test(ua)) return "android-chrome";
+    return "android-other";
+  }
+  return "desktop";
+}
+
+const chip = (label) => `<span class="chip-ui">${label}</span>`;
+const SHARE_CHIP = `<span class="chip-ui"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 14V3M7.5 7.5 12 3l4.5 4.5"/><path d="M8 10H6a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1h-2"/></svg>Compartilhar</span>`;
+
+// Passo a passo por navegador (texto fixo do app, nunca vem do usuário)
+const INSTALL_GUIDES = {
+  "ios-safari": {
+    browser: "Safari no iPhone",
+    steps: [
+      `Toque em ${SHARE_CHIP} na barra do Safari (no iOS mais novo ele fica dentro do ${chip("•••")}).`,
+      `Role as opções e toque em ${chip("Adicionar à Tela de Início")}.`,
+      `Confirme em ${chip("Adicionar")} e abra pelo ícone do copo.`,
+    ],
+  },
+  "ios-chrome": {
+    browser: "Chrome no iPhone",
+    steps: [
+      `Toque em ${SHARE_CHIP} ao lado da barra de endereço.`,
+      `Toque em ${chip("Adicionar à Tela de Início")} (se não aparecer, toque em ${chip("Mais")}).`,
+      `Confirme em ${chip("Adicionar")}.`,
+    ],
+    note: "Não achou a opção? Abra o link no Safari e siga os mesmos passos.",
+  },
+  "ios-other": {
+    browser: "navegador do iPhone",
+    steps: [
+      `Abra o menu do navegador (${chip("•••")} ou ${chip("≡")}) e toque em ${SHARE_CHIP}.`,
+      `Toque em ${chip("Adicionar à Tela de Início")}.`,
+      `Confirme em ${chip("Adicionar")}.`,
+    ],
+    note: "Se a opção não existir, copie o link e abra no Safari.",
+  },
+  "ios-inapp": {
+    browser: "navegador de dentro de um app",
+    steps: [
+      `Toque em ${chip("•••")} (ou no ícone da bússola) e escolha ${chip("Abrir no Safari")}.`,
+      `No Safari, toque em ${SHARE_CHIP}.`,
+      `Toque em ${chip("Adicionar à Tela de Início")} e depois em ${chip("Adicionar")}.`,
+    ],
+    note: "Dentro do Instagram ou do WhatsApp não dá pra instalar: precisa abrir no Safari.",
+  },
+  "android-chrome": {
+    browser: "Chrome no Android",
+    steps: [
+      `Toque em ${chip("⋮")} no canto superior direito.`,
+      `Toque em ${chip("Instalar app")} ou ${chip("Adicionar à tela inicial")}.`,
+      `Confirme em ${chip("Instalar")} e abra pelo ícone do copo.`,
+    ],
+    canPrompt: true,
+  },
+  "android-samsung": {
+    browser: "Samsung Internet",
+    steps: [
+      `Toque em ${chip("≡")} na barra de baixo.`,
+      `Toque em ${chip("Adicionar página a")} e escolha ${chip("Tela inicial")}.`,
+      `Confirme em ${chip("Adicionar")}.`,
+    ],
+    canPrompt: true,
+  },
+  "android-firefox": {
+    browser: "Firefox no Android",
+    steps: [
+      `Toque em ${chip("⋮")}.`,
+      `Toque em ${chip("Instalar")} ou ${chip("Adicionar à tela inicial")}.`,
+      `Confirme em ${chip("Adicionar")}.`,
+    ],
+  },
+  "android-inapp": {
+    browser: "navegador de dentro de um app",
+    steps: [
+      `Toque em ${chip("⋮")} e escolha ${chip("Abrir no Chrome")} (ou "Abrir no navegador").`,
+      `No Chrome, toque em ${chip("⋮")} e depois em ${chip("Instalar app")}.`,
+      `Confirme em ${chip("Instalar")}.`,
+    ],
+  },
+  "android-other": {
+    browser: "navegador do Android",
+    steps: [
+      `Abra o menu do navegador (${chip("⋮")} ou ${chip("≡")}).`,
+      `Toque em ${chip("Adicionar à tela inicial")} ou ${chip("Instalar app")}.`,
+      `Confirme e abra pelo ícone do copo.`,
+    ],
+    note: "Não achou? Abra o link no Chrome.",
+    canPrompt: true,
+  },
+  desktop: {
+    browser: "computador",
+    steps: [
+      `A Porradinha foi feita pro celular: abra este link no seu telefone.`,
+      `iPhone: Safari → ${SHARE_CHIP} → ${chip("Adicionar à Tela de Início")}.`,
+      `Android: Chrome → ${chip("⋮")} → ${chip("Instalar app")}.`,
+    ],
+    canPrompt: true,
+  },
+};
+
+// auto = primeira visita: o botão de fechar fica travado por INSTALL_HINT_LOCK_SECONDS.
+function openInstallGuide(auto) {
+  const guide = INSTALL_GUIDES[detectBrowser()] || INSTALL_GUIDES.desktop;
+  const node = document.createElement("div");
+  node.className = "install";
+  node.innerHTML =
+    `<div class="install-browser">Você abriu pelo <b>${guide.browser}</b></div>` +
+    `<ol class="install-steps">${guide.steps.map((s) => `<li><span>${s}</span></li>`).join("")}</ol>` +
+    (guide.note ? `<p class="install-note">${guide.note}</p>` : "");
+
+  if (guide.canPrompt && deferredInstallPrompt) {
+    const installBtn = document.createElement("button");
+    installBtn.type = "button";
+    installBtn.className = "btn";
+    installBtn.textContent = "📲 INSTALAR AGORA";
+    installBtn.addEventListener("click", async () => {
+      const prompt = deferredInstallPrompt;
+      if (!prompt) return;
+      deferredInstallPrompt = null;
+      prompt.prompt();
+      try {
+        const choice = await prompt.userChoice;
+        if (choice && choice.outcome === "accepted") { storage.set("installHintSeen", true); closeSheet(null); }
+      } catch (e) {}
+    });
+    node.appendChild(installBtn);
+  }
+
+  const lockMs = auto ? INSTALL_HINT_LOCK_SECONDS * 1000 : 0;
+  openSheet({
+    emoji: "📲",
+    title: "COLOCA NA TELA INICIAL",
+    text: "Assim a Porradinha abre em tela cheia, igual app, direto do ícone do copo.",
+    node,
+    signed: true,
+    kind: "install",
+    lockBackdrop: auto,
+    buttons: [{ label: "ENTENDI", value: "ok", style: "white" }],
+    onMount(sheet) {
+      if (!lockMs) return;
+      const closeBtn = sheet.querySelector(".actions .btn");
+      const bar = document.createElement("div");
+      bar.className = "install-timer";
+      bar.innerHTML = `<i style="animation-duration:${lockMs}ms"></i>`;
+      closeBtn.parentNode.appendChild(bar);
+      closeBtn.disabled = true;
+      const endsAt = Date.now() + lockMs;
+      let timer = null;
+      const update = () => {
+        const left = Math.ceil((endsAt - Date.now()) / 1000);
+        if (left > 0) { closeBtn.textContent = `PODE FECHAR EM ${left}s`; return; }
+        clearInterval(timer);
+        closeBtn.disabled = false;
+        closeBtn.textContent = "ENTENDI";
+        bar.remove();
+        if (sheetCtx && sheetCtx.kind === "install") sheetCtx.lockBackdrop = false;
+      };
+      timer = setInterval(update, 200);
+      update();
+    },
+  }).then(() => { if (auto) storage.set("installHintSeen", true); });
+}
+
+/* ============================== DEVICE (sem zoom, só na vertical) ============================== */
+function lockZoom() {
+  const content = "width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover";
+  document.querySelectorAll('meta[name="viewport"]').forEach((m) => m.setAttribute("content", content));
+  const block = (e) => e.preventDefault();
+  // iPhone ignora user-scalable=no: bloqueia a pinça pelos eventos de gesto
+  ["gesturestart", "gesturechange", "gestureend"].forEach((t) => document.addEventListener(t, block, { passive: false }));
+  document.addEventListener("touchmove", (e) => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+  document.addEventListener("dblclick", block, { passive: false });
+  let lastTouchEnd = 0;
+  document.addEventListener("touchend", (e) => {
+    const now = Date.now();
+    const onControl = e.target.closest && e.target.closest("button, input, label, a, [role='button'], .slider");
+    if (now - lastTouchEnd < 320 && !onControl) e.preventDefault(); // duplo toque fora de botões
+    lastTouchEnd = now;
+  }, { passive: false });
+  document.addEventListener("wheel", (e) => { if (e.ctrlKey) e.preventDefault(); }, { passive: false });
+  document.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && ["+", "-", "=", "0"].includes(e.key)) e.preventDefault();
+  });
+}
+
+// Deitado = o aparelho diz que está na horizontal E a página está mais larga que alta, em tela de celular.
+// Não usa media query de orientação: no Android o teclado encolhe a página e "vira" paisagem.
+function watchOrientation() {
+  const update = () => {
+    const type = screen.orientation && screen.orientation.type;
+    const byDevice = type ? type.indexOf("landscape") === 0
+      : typeof window.orientation === "number" ? Math.abs(window.orientation) === 90 : null;
+    const typing = document.activeElement && /^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName);
+    const wide = window.innerWidth > window.innerHeight;
+    const phone = Math.min(screen.width, screen.height) <= 520;
+    const landscape = phone && (byDevice === null ? wide && !typing : byDevice && (wide || typing));
+    document.documentElement.classList.toggle("is-landscape", !!landscape);
+  };
+  window.addEventListener("resize", update);
+  window.addEventListener("orientationchange", update);
+  if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener("change", update);
+  document.addEventListener("focusin", update);
+  document.addEventListener("focusout", () => setTimeout(update, 300));
+  update();
+  try {
+    const p = screen.orientation && screen.orientation.lock && screen.orientation.lock("portrait");
+    if (p && p.catch) p.catch(() => {});
+  } catch (e) {}
 }
 
 /* ============================== NAVIGATION ============================== */
@@ -1532,17 +2689,29 @@ function go(screen) {
   if (sheetCtx) closeSheet(null);
   SCREENS.forEach((s) => { $("#screen-" + s).hidden = s !== screen; });
   $("#screen-" + screen).scrollTop = 0;
+  if (screen === "start") syncPasswordField();
   if (screen === "main") renderMain();
   if (screen === "result") renderResult();
-  if (screen === "ranking") renderRanking();
+  if (screen === "ranking") {
+    renderRanking();
+    if (ONLINE && Date.now() - server.lastFetch > 5000) fetchRanking();
+  }
   tick();
 }
 
 function renderMain() {
   $("#mainNick").textContent = state.profile.nick;
   const org = $("#mainOrg");
-  org.textContent = state.profile.org;
-  org.hidden = !state.profile.org;
+  const badge = profileBadge();
+  org.textContent = "";
+  if (badge) {
+    const tag = document.createElement("span");
+    tag.className = "role-tag";
+    tag.textContent = badge;
+    org.appendChild(tag);
+  }
+  org.appendChild(document.createTextNode(state.profile.org || ""));
+  org.hidden = !state.profile.org && !badge;
   if (!state.animating) {
     renderCounter(state.session.count, false);
     setFill(cooldownProgress(), 0);
@@ -1551,29 +2720,46 @@ function renderMain() {
 
 // ENCERRAR: volta ao início. O histórico do ranking local é mantido.
 function endAll() {
+  if (ONLINE && state.session && state.session.remoteId && state.session.dirty) {
+    state.outbox.push({ p_id: state.session.remoteId, p_count: state.session.count, p_status: state.result ? "finished" : "drinking" });
+  }
+  if (ONLINE && profileBadge()) rpc("release_admin", {}).catch(() => {});
   state.profile = null;
   state.session = null;
   state.result = null;
   saveState();
   $("#inNick").value = "";
   $("#inOrg").value = "";
+  $("#inPass").value = "";
   go("start");
+  syncSoon();
 }
 
 function init() {
   loadState();
+  saveState(); // grava ajustes de formato (ex.: id em contagem antiga)
+  lockZoom();
+  watchOrientation();
   mountArt();
   setupIcons();
   initSlider();
 
   $("#startForm").addEventListener("submit", onStartSubmit);
   $("#inNick").addEventListener("input", () => {
-    $("#fieldNick").classList.remove("has-error");
-    $("#nickError").textContent = "";
+    clearFieldError("fieldNick", "nickError");
+    syncPasswordField();
   });
   $("#inNick").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); ($("#fieldPass").hidden ? $("#inOrg") : $("#inPass")).focus(); }
+  });
+  $("#inPass").addEventListener("input", () => clearFieldError("fieldPass", "passError"));
+  $("#inPass").addEventListener("keydown", (e) => {
     if (e.key === "Enter") { e.preventDefault(); $("#inOrg").focus(); }
   });
+  $("#installLink").hidden = isStandalone();
+  $("#installLink").addEventListener("click", () => openInstallGuide(false));
+  $("#startRankingLink").addEventListener("click", () => go("ranking"));
+  $("#rankingBtn").addEventListener("click", () => { if (!state.animating) go("ranking"); });
   $("#drinkBtn").addEventListener("click", tryDrink);
   $("#cupPos").addEventListener("click", tryDrink);
   $("#cupPos").addEventListener("keydown", (e) => {
@@ -1581,7 +2767,10 @@ function init() {
   });
   $("#menuBtn").addEventListener("click", openMenu);
   $("#toRankingBtn").addEventListener("click", () => go("ranking"));
-  $("#backToResultBtn").addEventListener("click", () => go("result"));
+  $("#rankBackBtn").addEventListener("click", rankingBack);
+  $("#filterBtn").addEventListener("click", openFilterSheet);
+  $("#resetRankingBtn").addEventListener("click", resetRanking);
+  window.addEventListener("storage", onStorageSync);
   $("#endBtn").addEventListener("click", endAll);
   $("#undoBtn").addEventListener("click", undoFinish);
   document.addEventListener("keydown", (e) => {
@@ -1591,10 +2780,24 @@ function init() {
 
   // Retoma de onde parou (atualizar a página não perde nada)
   let screen = "start";
-  if (state.result) screen = state.screen === "ranking" ? "ranking" : "result";
+  if (state.result) screen = "result";
   else if (state.profile && state.session) screen = "main";
+  if (state.screen === "ranking") screen = "ranking";
   go(screen);
   setInterval(tick, 250);
+
+  // Servidor: login anônimo, ranking ao vivo e envio do que ficou pendente
+  startServer();
+  window.addEventListener("online", () => { syncSoon(); fetchRanking(); });
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) { syncSoon(); fetchRanking(); }
+  });
+  if ("serviceWorker" in navigator && location.protocol === "https:") {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  }
+
+  // Primeira visita: ensina a colocar na tela inicial
+  if (!isStandalone() && !storage.get("installHintSeen", false)) openInstallGuide(true);
 }
 
 init();
