@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#16274a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Porradinha">
+<title>PORRADINHA · República Rapina</title>
+<!-- Ícones (favicon, apple-touch-icon e manifest PWA) são gerados em JS a partir do desenho do copo — ver ICON -->
+<link rel="icon" id="favicon" href="data:,">
+<link rel="apple-touch-icon" id="appleIcon" href="data:,">
+<!-- Fonte opcional: sem internet, cai para Impact / Arial Black -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&display=swap">
+<style>
+/* =====================================================================
+   PORRADINHA — estilos
+   ===================================================================== */
+:root {
+  --navy: #16274a;
+  --navy-2: #0d1830;
+  --navy-3: #243c6b;
+  --orange: #ff6a13;
+  --orange-2: #ff8f45;
+  --orange-dark: #b8440a;
+  --white: #ffffff;
+  --display: 'Anton', Impact, 'Arial Black', 'Helvetica Neue', system-ui, sans-serif;
+  --body: system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--navy-2);
+  color: var(--white);
+  font-family: var(--body);
+  overscroll-behavior: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+/* Sem zoom por pinça / duplo toque: quem entende "pan-x pan-y" usa; o resto fica com "manipulation" */
+*, *::before, *::after { touch-action: manipulation; touch-action: pan-x pan-y; }
+input { -webkit-user-select: text; user-select: text; }
+button { font: inherit; color: inherit; }
+[hidden] { display: none !important; }
+
+/* ---------- Telas ---------- */
+.screen {
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: calc(var(--safe-top) + 14px) 18px calc(var(--safe-bottom) + 14px);
+  overflow: hidden;
+  background: var(--navy-2);
+}
+.screen::before { /* faixas diagonais inspiradas na logo */
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(118deg, transparent 0 60%, rgba(255,255,255,.05) 60% 67%, rgba(255,106,19,.20) 67% 100%),
+    radial-gradient(120% 60% at 0% 100%, rgba(36,60,107,.9), transparent 70%);
+}
+.screen > * { position: relative; }
+.screen.scroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+/* ---------- Botões ---------- */
+.btn {
+  appearance: none;
+  border: 0;
+  width: 100%;
+  height: 64px;
+  border-radius: 18px;
+  font-family: var(--display);
+  font-size: 24px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--orange);
+  box-shadow: 0 6px 0 var(--orange-dark), 0 14px 28px rgba(255,106,19,.30);
+  cursor: pointer;
+  transition: transform .08s, box-shadow .08s, background .2s;
+}
+.btn:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--orange-dark), 0 6px 14px rgba(255,106,19,.25); }
+.btn.is-cooling { background: #4b5670; box-shadow: 0 6px 0 #313a4f; }
+.btn.is-cooling:active { box-shadow: 0 2px 0 #313a4f; }
+.btn-white { background: #fff; color: var(--navy); box-shadow: 0 6px 0 #c3cbdb, 0 14px 28px rgba(0,0,0,.25); }
+.btn-white:active { box-shadow: 0 2px 0 #c3cbdb; }
+.btn-ghost {
+  background: transparent;
+  border: 2px solid rgba(255,255,255,.28);
+  box-shadow: none;
+  height: 56px;
+  font-size: 19px;
+}
+.btn-ghost:active { box-shadow: none; background: rgba(255,255,255,.08); }
+.btn-danger { background: #e23b3b; box-shadow: 0 6px 0 #9c2323; }
+.btn-danger:active { box-shadow: 0 2px 0 #9c2323; }
+
+/* ---------- Logo ---------- */
+.logo { display: block; overflow: hidden; background: #fff; flex: none; }
+.logo svg, .logo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* =====================================================================
+   TELA INICIAL
+   ===================================================================== */
+.start-wrap {
+  margin: auto;
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 8px 0;
+}
+.start-logo {
+  width: 120px; height: 120px;
+  margin: 0 auto 4px;
+  border-radius: 26px;
+  box-shadow: 0 0 0 4px #fff, 0 16px 36px rgba(0,0,0,.45);
+  transform: rotate(-4deg);
+}
+.app-title {
+  margin: 4px 0 0;
+  text-align: center;
+  font-family: var(--display);
+  font-weight: 400;
+  font-size: clamp(50px, 15vw, 72px);
+  line-height: .95;
+  letter-spacing: 1px;
+  color: #fff;
+  text-shadow: 4px 4px 0 var(--orange);
+}
+.tagline { margin: 0 0 10px; text-align: center; font-size: 21px; font-weight: 800; }
+.field label {
+  display: block;
+  margin: 0 0 6px 2px;
+  font-family: var(--display);
+  font-size: 16px;
+  letter-spacing: 1px;
+  color: var(--orange-2);
+}
+.field label small { font-family: var(--body); font-size: 12px; font-weight: 700; letter-spacing: 0; color: rgba(255,255,255,.55); }
+.field input, .sheet input {
+  width: 100%;
+  height: 60px;
+  padding: 0 16px;
+  border-radius: 16px;
+  border: 2px solid rgba(255,255,255,.18);
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  font-size: 21px;
+  font-weight: 800;
+  outline: none;
+}
+.field input:focus, .sheet input:focus { border-color: var(--orange); background: rgba(255,255,255,.13); }
+.field input::placeholder, .sheet input::placeholder { color: rgba(255,255,255,.32); }
+.field.has-error input { border-color: #ff5a5a; animation: shake .35s; }
+.field-error { min-height: 18px; margin: 6px 0 0 2px; font-size: 14px; font-weight: 700; color: #ff9b9b; }
+.start-wrap .btn { margin-top: 6px; }
+
+/* =====================================================================
+   TELA PRINCIPAL
+   ===================================================================== */
+.topbar { display: flex; align-items: center; gap: 12px; flex: none; }
+.logo-sm { width: 50px; height: 50px; border-radius: 13px; box-shadow: 0 0 0 2px #fff; }
+.who { flex: 1; min-width: 0; }
+.who-nick {
+  font-family: var(--display);
+  font-size: 28px;
+  line-height: 1.05;
+  text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.who-org { font-size: 15px; font-weight: 800; color: var(--orange-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.icon-btn {
+  flex: none;
+  width: 54px; height: 54px;
+  border: 0; border-radius: 16px;
+  background: rgba(255,255,255,.10);
+  font-size: 28px; line-height: 1;
+  cursor: pointer;
+}
+.icon-btn:active { background: rgba(255,255,255,.2); }
+
+.stage { flex: 1; min-height: 150px; position: relative; margin: 6px -18px 0; }
+.stage::before { /* brilho atrás do copo */
+  content: "";
+  position: absolute;
+  left: 50%; bottom: 0;
+  width: 90%; height: 80%;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(255,106,19,.35), transparent);
+  pointer-events: none;
+}
+.table {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  height: 14px;
+  background: linear-gradient(var(--orange), #c24d0b);
+  box-shadow: 0 -2px 0 rgba(255,255,255,.35);
+}
+.cup-pos {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  height: calc(100% - 16px);
+  aspect-ratio: 220 / 420;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+.cup-wrap { width: 100%; height: 100%; transform-origin: 50% 100%; }
+.cup-wrap svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.tap-hint {
+  position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%);
+  white-space: nowrap; font-size: 12px; font-weight: 800; letter-spacing: 1px;
+  color: rgba(255,255,255,.0); pointer-events: none; transition: color .3s;
+}
+
+/* Líquido / espuma / bolhas */
+#liquid { transform: translateY(calc((1 - var(--fill, 1)) * 226px)); transition: transform .3s linear; }
+#foam { transform-box: fill-box; transform-origin: 50% 100%; transform: scaleY(0); opacity: 0; transition: transform .75s cubic-bezier(.2,1.5,.4,1), opacity .25s; }
+.drip { opacity: 0; transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); transition: transform .5s .45s ease-out, opacity .2s .45s; }
+.cup-wrap.foamy #foam { transform: scaleY(1); opacity: 1; }
+.cup-wrap.foamy .drip { transform: scaleY(1); opacity: 1; }
+.cup-wrap.foamy .foam-inner { animation: foamWobble .5s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 50% 100%; }
+#bubbles circle { opacity: 0; }
+.cup-wrap.bubbling #bubbles circle { animation: rise .8s ease-in infinite; }
+.cup-wrap.ready { animation: readyPulse 2.4s ease-in-out infinite; }
+
+/* Sequência da Porradinha */
+.cup-wrap.slam  { animation: slam .42s cubic-bezier(.55,0,.8,.2) both; }
+.cup-wrap.shake { animation: cupShake .3s linear both; }
+.cup-wrap.drink { animation: drink 1.05s ease-in-out both; transform-origin: 50% 55%; }
+.impact { position: absolute; left: 50%; bottom: 4px; width: 78%; transform: translateX(-50%); opacity: 0; pointer-events: none; overflow: visible; }
+.impact.go { animation: impact .5s ease-out both; }
+
+.counter { flex: none; text-align: center; line-height: .9; margin-top: 10px; }
+.count-num {
+  display: inline-block;
+  font-family: var(--display);
+  font-size: clamp(66px, 21vw, 100px);
+  color: #fff;
+  text-shadow: 5px 5px 0 var(--orange);
+}
+.count-num.bump { animation: bump .55s cubic-bezier(.2,1.6,.4,1); }
+.count-label { font-family: var(--display); font-size: 21px; letter-spacing: 4px; color: var(--orange-2); }
+.cool-line { flex: none; height: 26px; margin: 6px 0 8px; text-align: center; font-size: 16px; font-weight: 800; color: rgba(255,255,255,.75); }
+.cool-line b { color: #fff; font-variant-numeric: tabular-nums; }
+
+/* Slider “deslize para finalizar” */
+.slider {
+  position: relative;
+  flex: none;
+  height: 58px;
+  margin-top: 14px;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.05);
+  overflow: hidden;
+  touch-action: none;
+}
+.slider-fill { position: absolute; top: 0; bottom: 0; left: 0; width: 0; background: rgba(255,106,19,.28); }
+.slider-text {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding-left: 46px;
+  font-family: var(--display); font-size: 16px; letter-spacing: 1.5px;
+  color: rgba(255,255,255,.62);
+  opacity: calc(1 - var(--p, 0) * 1.6);
+  pointer-events: none;
+}
+.slider-text .arrows { margin-left: 8px; color: var(--orange-2); animation: arrows 1.4s ease-in-out infinite; }
+.slider-thumb {
+  position: absolute; top: 4px; left: 4px;
+  width: 46px; height: 46px;
+  border: 0; border-radius: 50%;
+  background: #fff; color: var(--navy);
+  font-size: 24px; font-weight: 900; line-height: 1;
+  display: grid; place-items: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,.35);
+  touch-action: none;
+  cursor: grab;
+}
+.slider.returning .slider-thumb { transition: transform .28s cubic-bezier(.3,1.4,.5,1); }
+.slider.returning .slider-fill { transition: width .28s; }
+.slider.nudge .slider-thumb { animation: nudge .6s ease-in-out; }
+
+/* =====================================================================
+   CONTAGEM 1-2-3
+   ===================================================================== */
+.countdown {
+  position: fixed; inset: 0; z-index: 50;
+  display: grid; place-items: center;
+  background: rgba(8,14,28,.62);
+  -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px);
+}
+.cd-text {
+  font-family: var(--display);
+  font-size: min(52vw, 280px);
+  line-height: 1;
+  color: #fff;
+  text-shadow: 8px 8px 0 var(--orange);
+}
+.cd-text.word { font-size: clamp(54px, 17vw, 110px); color: var(--orange); text-shadow: 5px 5px 0 #fff; transform: rotate(-6deg); }
+.cd-text.pop { animation: pop .45s cubic-bezier(.2,1.6,.4,1) both; }
+.cd-text.word.pop { animation: popWord .6s cubic-bezier(.2,1.6,.4,1) both; }
+
+/* =====================================================================
+   SHEETS / DIÁLOGOS / TOAST
+   ===================================================================== */
+.overlay {
+  position: fixed; inset: 0; z-index: 60;
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 16px 14px calc(var(--safe-bottom) + 14px);
+  background: rgba(5,10,22,.74);
+  animation: fadeIn .18s ease-out;
+}
+.sheet {
+  width: 100%; max-width: 440px;
+  max-height: calc(100dvh - 40px); overflow-y: auto;
+  padding: 22px 20px 18px;
+  border-radius: 28px;
+  border: 2px solid rgba(255,255,255,.12);
+  background: var(--navy);
+  box-shadow: 0 -10px 40px rgba(0,0,0,.4);
+  animation: sheetIn .25s cubic-bezier(.2,1.2,.4,1);
+}
+.sheet .emoji { font-size: 54px; line-height: 1; text-align: center; margin-bottom: 8px; }
+.sheet h2 { margin: 0 0 8px; font-family: var(--display); font-weight: 400; font-size: 32px; line-height: 1.05; text-align: center; letter-spacing: .5px; }
+.sheet p { margin: 0 0 16px; font-size: 18px; line-height: 1.4; text-align: center; color: rgba(255,255,255,.86); }
+.sheet .big-timer { margin: -4px 0 16px; text-align: center; font-size: 18px; font-weight: 800; color: rgba(255,255,255,.8); }
+.sheet .big-timer b { display: block; font-family: var(--display); font-weight: 400; font-size: 64px; line-height: 1.05; color: var(--orange); font-variant-numeric: tabular-nums; }
+.sheet input { margin-bottom: 6px; }
+.sheet .field-error { text-align: left; }
+.sheet .actions { display: flex; flex-direction: column; gap: 12px; margin-top: 8px; }
+.menu-list { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 12px; }
+.menu-item {
+  display: flex; align-items: center; gap: 14px;
+  width: 100%; min-height: 60px; padding: 0 16px;
+  border: 0; border-radius: 16px;
+  background: rgba(255,255,255,.07);
+  font-size: 18px; font-weight: 800; text-align: left;
+  cursor: pointer;
+}
+.menu-item:active { background: rgba(255,255,255,.15); }
+.menu-item .mi-icon { width: 30px; font-size: 22px; text-align: center; }
+.menu-item.danger { color: #ff9b9b; }
+
+.toast {
+  position: fixed; z-index: 55;
+  left: 14px; right: 14px;
+  top: calc(var(--safe-top) + 78px);
+  max-width: 440px; margin: 0 auto;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border-left: 10px solid var(--orange);
+  background: #fff; color: var(--navy);
+  font-size: 19px; font-weight: 900; line-height: 1.3;
+  box-shadow: 0 14px 34px rgba(0,0,0,.45);
+  animation: toastIn .35s cubic-bezier(.2,1.4,.4,1);
+}
+.toast.out { animation: toastOut .25s ease-in both; }
+
+/* =====================================================================
+   TELA FINAL — CARD PARA STORIES
+   ===================================================================== */
+#screen-result { align-items: center; padding-bottom: calc(var(--safe-bottom) + 120px); }
+.story-card {
+  flex: none;
+  position: relative;
+  width: clamp(270px, calc((100dvh - 150px) * 0.5625), 430px);
+  max-width: 100%;
+  aspect-ratio: 9 / 16;
+  container-type: inline-size;
+  overflow: hidden;
+  border-radius: 26px;
+  background: var(--navy);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5);
+  display: flex; flex-direction: column; align-items: center;
+  padding: 7cqw 6cqw 6cqw;
+  text-align: center;
+  isolation: isolate;
+}
+.story-card::before { /* faixas da logo */
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background:
+    linear-gradient(122deg, transparent 0 56%, #fff 56% 60.5%, var(--orange) 60.5% 100%);
+  opacity: 1;
+  clip-path: polygon(0 62%, 100% 38%, 100% 100%, 0 100%);
+}
+.story-card::after { /* retícula sutil */
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1.4px);
+  background-size: 3.2cqw 3.2cqw;
+  -webkit-mask-image: linear-gradient(#000, transparent 60%); mask-image: linear-gradient(#000, transparent 60%);
+}
+.sc-head { display: flex; align-items: center; justify-content: center; gap: 3.5cqw; }
+.sc-logo { width: 19cqw; height: 19cqw; border-radius: 4.5cqw; box-shadow: 0 0 0 1.1cqw #fff; transform: rotate(-5deg); }
+.sc-title { font-family: var(--display); font-size: 13.5cqw; line-height: 1; letter-spacing: .3cqw; text-shadow: 1cqw 1cqw 0 var(--orange); }
+.sc-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; min-height: 0; }
+.sc-nick {
+  max-width: 100%;
+  font-family: var(--display); font-size: 13cqw; line-height: 1.05;
+  text-transform: uppercase; overflow-wrap: anywhere;
+}
+.sc-org {
+  margin-top: 1.5cqw; padding: .8cqw 3.6cqw;
+  border-radius: 99px; background: var(--orange);
+  font-family: var(--display); font-size: 5.6cqw; letter-spacing: .4cqw; text-transform: uppercase;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.sc-took { margin-top: 4cqw; font-family: var(--display); font-size: 6cqw; letter-spacing: 1.4cqw; color: rgba(255,255,255,.75); }
+.sc-num-row { position: relative; display: flex; align-items: center; justify-content: center; }
+.sc-num {
+  font-family: var(--display); font-size: 44cqw; line-height: .92;
+  color: #fff; text-shadow: 1.6cqw 1.6cqw 0 var(--orange), -.4cqw -.4cqw 0 var(--navy-2);
+  font-variant-numeric: tabular-nums;
+}
+.sc-num.d3 { font-size: 34cqw; }
+.sc-cup { position: absolute; right: -15cqw; bottom: 2cqw; width: 15cqw; transform: rotate(14deg); filter: drop-shadow(0 1cqw 1cqw rgba(0,0,0,.35)); }
+.sc-label {
+  margin-top: 1cqw; padding: 0 3cqw;
+  font-family: var(--display); font-size: 9.5cqw; letter-spacing: .6cqw; line-height: 1.1;
+  color: var(--navy); background: #fff; transform: rotate(-3deg);
+  box-shadow: 1.2cqw 1.2cqw 0 var(--orange);
+}
+.sc-phrase { margin-top: 5cqw; padding: 2cqw 3.6cqw; border-radius: 3cqw; background: rgba(13,24,48,.92); font-size: 4.6cqw; font-weight: 900; line-height: 1.25; max-width: 96%; }
+.sc-foot { width: 100%; }
+.sc-post { display: inline-block; padding: 1.2cqw 4cqw; border-radius: 2cqw; background: var(--navy); font-family: var(--display); font-size: 6.4cqw; letter-spacing: .5cqw; }
+.sc-tag { display: inline-block; margin-top: 1.6cqw; padding: .6cqw 2.4cqw; border-radius: 99px; background: rgba(13,24,48,.9); font-size: 3.6cqw; font-weight: 800; color: #fff; }
+.sc-handle { margin-top: .6cqw; font-family: var(--display); font-size: 8.5cqw; letter-spacing: .2cqw; color: #fff; text-shadow: .8cqw .8cqw 0 var(--navy); }
+.sc-date { margin-top: .6cqw; font-size: 3cqw; font-weight: 800; color: rgba(255,255,255,.85); }
+.result-actions { flex: none; width: clamp(270px, calc((100dvh - 150px) * 0.5625), 430px); max-width: 100%; margin-top: 18px; }
+
+.undo {
+  position: fixed; z-index: 45;
+  left: 12px; right: 12px;
+  bottom: calc(var(--safe-bottom) + 12px);
+  max-width: 460px; margin: 0 auto;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 12px 16px 16px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff; color: var(--navy);
+  box-shadow: 0 14px 40px rgba(0,0,0,.5);
+  animation: toastIn .35s cubic-bezier(.2,1.4,.4,1);
+}
+.undo-text { flex: 1; font-size: 15px; font-weight: 800; line-height: 1.25; }
+.undo-text small { display: block; font-size: 13px; font-weight: 700; opacity: .65; }
+.undo .btn { width: auto; height: 50px; padding: 0 16px; font-size: 17px; }
+.undo-bar { position: absolute; left: 0; bottom: 0; height: 6px; width: 100%; background: var(--orange); transition: width .25s linear; }
+
+/* =====================================================================
+   RANKING
+   ===================================================================== */
+#screen-ranking { padding-bottom: 0; }
+.rank-inner { width: 100%; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; min-height: 100%; }
+.rank-head { display: flex; align-items: center; gap: 14px; margin: 4px 0 4px; }
+.rank-title { margin: 0; font-family: var(--display); font-weight: 400; font-size: clamp(28px, 8.4vw, 38px); line-height: 1; }
+.rank-title span { color: var(--orange-2); }
+.rank-sub { margin: 4px 0 18px; font-size: 14px; font-weight: 700; color: rgba(255,255,255,.62); }
+.rank-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.rank-row {
+  position: relative;
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px 12px 10px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.07);
+}
+.rank-pos { flex: none; width: 50px; text-align: center; font-family: var(--display); font-size: 26px; color: rgba(255,255,255,.7); }
+.rank-medal { display: block; font-size: 40px; line-height: 1; }
+.rank-place { display: block; margin-top: 2px; font-family: var(--display); font-size: 11px; letter-spacing: .5px; }
+.rank-info { flex: 1; min-width: 0; }
+.rank-nick { font-family: var(--display); font-size: 24px; line-height: 1.1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-org { font-size: 15px; font-weight: 800; color: var(--orange-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rank-qty { flex: none; text-align: right; font-family: var(--display); font-size: 32px; line-height: 1; }
+.rank-qty small { display: block; margin-top: 2px; font-family: var(--body); font-size: 12px; font-weight: 800; letter-spacing: .3px; opacity: .75; }
+.rank-row.p1 { padding: 18px 18px 18px 10px; background: linear-gradient(115deg, var(--orange), #ffa05a); box-shadow: 0 10px 26px rgba(255,106,19,.35); }
+.rank-row.p1 .rank-nick { font-size: 30px; }
+.rank-row.p1 .rank-qty { font-size: 42px; }
+.rank-row.p1 .rank-org, .rank-row.p1 .rank-pos { color: #fff; }
+.rank-row.p1 .rank-medal { font-size: 50px; }
+.rank-row.p2 { background: linear-gradient(115deg, #34528a, #466aa8); padding-top: 15px; padding-bottom: 15px; }
+.rank-row.p3 { background: linear-gradient(115deg, #2a4474, #36568f); padding-top: 14px; padding-bottom: 14px; }
+.rank-row.p2 .rank-pos, .rank-row.p3 .rank-pos { color: #fff; }
+.rank-divider { margin: 14px 0 6px; font-size: 12px; font-weight: 800; letter-spacing: 2px; color: rgba(255,255,255,.45); text-align: center; }
+.rank-row.me { box-shadow: inset 0 0 0 3px var(--orange); }
+.rank-row.p1.me { box-shadow: inset 0 0 0 3px #fff, 0 10px 26px rgba(255,106,19,.35); }
+.you-tag {
+  display: inline-block; vertical-align: 4px;
+  margin-left: 6px; padding: 3px 7px;
+  border-radius: 7px;
+  background: var(--orange); color: #fff;
+  font-family: var(--body); font-size: 11px; font-weight: 900; letter-spacing: .5px;
+}
+.rank-row.p1 .you-tag { background: #fff; color: var(--orange); }
+.rank-org .you-tag { margin: 0 6px 0 0; vertical-align: 1px; }
+.rank-actions {
+  position: sticky; bottom: 0;
+  margin-top: auto;
+  padding: 26px 0 calc(var(--safe-bottom) + 14px);
+  display: grid; gap: 12px;
+  background: linear-gradient(transparent, var(--navy-2) 36%);
+}
+
+/* =====================================================================
+   ANIMAÇÕES
+   ===================================================================== */
+@keyframes shake { 0%,100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 50% { transform: translateX(7px); } 75% { transform: translateX(-4px); } }
+@keyframes pop { 0% { transform: scale(.2); opacity: 0; } 60% { opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes popWord { 0% { transform: scale(.2) rotate(-20deg); opacity: 0; } 100% { transform: scale(1) rotate(-6deg); opacity: 1; } }
+@keyframes slam {
+  0%   { transform: translateY(0) rotate(0); }
+  40%  { transform: translateY(-16%) rotate(-4deg); }
+  88%  { transform: translateY(0) scale(1.04, .94); }
+  100% { transform: translateY(0) scale(1); }
+}
+@keyframes cupShake {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  20% { transform: translate(-7px,1px) rotate(-2.5deg); }
+  40% { transform: translate(6px,0) rotate(2deg); }
+  60% { transform: translate(-4px,1px) rotate(-1.2deg); }
+  80% { transform: translate(3px,0) rotate(.8deg); }
+}
+@keyframes drink {
+  0%   { transform: translate(0,0) rotate(0); }
+  28%  { transform: translate(-6%,-22%) rotate(-62deg); }
+  72%  { transform: translate(-8%,-24%) rotate(-78deg); }
+  100% { transform: translate(0,0) rotate(0); }
+}
+@keyframes impact { 0% { opacity: 1; transform: translateX(-50%) scale(.5); } 100% { opacity: 0; transform: translateX(-50%) scale(1.35); } }
+@keyframes rise { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: 1; } 100% { transform: translateY(-190px); opacity: 0; } }
+@keyframes foamWobble { from { transform: scale(1, 1); } to { transform: scale(1.03, 1.08); } }
+@keyframes readyPulse { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-1.5%); } }
+@keyframes bump { 0% { transform: scale(1); } 35% { transform: scale(1.35); color: var(--orange-2); } 100% { transform: scale(1); } }
+@keyframes arrows { 0%,100% { transform: translateX(0); opacity: .5; } 50% { transform: translateX(6px); opacity: 1; } }
+@keyframes nudge { 0%,100% { transform: translateX(0); } 30% { transform: translateX(40px); } 60% { transform: translateX(0); } 80% { transform: translateX(14px); } }
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes sheetIn { from { transform: translateY(40px); opacity: 0; } }
+@keyframes toastIn { from { transform: translateY(-24px) scale(.96); opacity: 0; } }
+@keyframes toastOut { to { transform: translateY(-20px); opacity: 0; } }
+
+/* Telas baixas (iPhone SE etc.) */
+@media (max-height: 700px) {
+  .logo-sm { width: 42px; height: 42px; }
+  .who-nick { font-size: 23px; }
+  .icon-btn { width: 48px; height: 48px; }
+  .count-num { font-size: 60px; }
+  .count-label { font-size: 17px; }
+  .btn { height: 58px; font-size: 21px; }
+  .slider { height: 54px; margin-top: 10px; }
+  .slider-thumb { width: 42px; height: 42px; }
+  .cool-line { margin: 4px 0 6px; }
+  .start-logo { width: 92px; height: 92px; }
+  .app-title { font-size: 48px; }
+  .field input { height: 54px; }
+}
+@media (min-width: 700px) {
+  .screen { padding-left: calc(50vw - 230px); padding-right: calc(50vw - 230px); }
+  .stage { margin-left: 0; margin-right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cup-wrap.ready, .slider-text .arrows, .cup-wrap.foamy .foam-inner { animation: none; }
+}
+</style>
+</head>
+<body>
+<!-- ============================ TELA INICIAL ============================ -->
+<section class="screen scroll" id="screen-start" hidden>
+  <form class="start-wrap" id="startForm" novalidate autocomplete="off">
+    <div class="logo start-logo" data-logo></div>
+    <h1 class="app-title">PORRADINHA</h1>
+    <p class="tagline">Quem vai beber hoje?</p>
+
+    <div class="field" id="fieldNick">
+      <label for="inNick">APELIDO</label>
+      <input id="inNick" name="nick" type="text" placeholder="Canhoto" maxlength="20" enterkeyhint="next" autocapitalize="words" spellcheck="false">
+      <div class="field-error" id="nickError"></div>
+    </div>
+
+    <div class="field">
+      <label for="inOrg">REPÚBLICA / ATLÉTICA / ORGANIZAÇÃO <small>(opcional)</small></label>
+      <input id="inOrg" name="org" type="text" placeholder="Rapina" maxlength="30" enterkeyhint="go" autocapitalize="words" spellcheck="false">
+    </div>
+
+    <button class="btn" type="submit">COMEÇAR</button>
+  </form>
+</section>
+
+<!-- ============================ TELA PRINCIPAL ============================ -->
+<section class="screen" id="screen-main" hidden>
+  <header class="topbar">
+    <div class="logo logo-sm" data-logo></div>
+    <div class="who">
+      <div class="who-nick" id="mainNick">—</div>
+      <div class="who-org" id="mainOrg"></div>
+    </div>
+    <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu">☰</button>
+  </header>
+
+  <div class="stage">
+    <div class="table"></div>
+    <svg class="impact" id="impact" viewBox="-100 -50 200 56" aria-hidden="true">
+      <g stroke-linecap="round" stroke-width="6">
+        <line x1="-46" y1="-4"  x2="-92" y2="-16" stroke="#fff"/>
+        <line x1="-40" y1="-14" x2="-74" y2="-44" stroke="#ff8f45"/>
+        <line x1="46"  y1="-4"  x2="92"  y2="-16" stroke="#fff"/>
+        <line x1="40"  y1="-14" x2="74"  y2="-44" stroke="#ff8f45"/>
+        <line x1="-20" y1="-22" x2="-30" y2="-48" stroke="#fff"/>
+        <line x1="20"  y1="-22" x2="30"  y2="-48" stroke="#fff"/>
+      </g>
+    </svg>
+    <div class="cup-pos" id="cupPos" role="button" tabindex="0" aria-label="Tomei uma Porradinha">
+      <div class="cup-wrap" id="cupWrap">
+        <!-- COPO DE PORRADINHA: shot alto, afunilado, base grossa com dois anéis (ref. foto enviada) -->
+        <svg viewBox="-10 -80 220 420" aria-hidden="true">
+          <defs>
+            <clipPath id="cavityClip"><path d="M18,10 L182,10 L165,236 Q162,258 100,260 Q38,258 35,236 Z"/></clipPath>
+            <clipPath id="foamClip"><path d="M18,10 L182,10 L165,236 Q162,258 100,260 Q38,258 35,236 Z"/><rect x="-10" y="-80" width="220" height="92"/></clipPath>
+            <linearGradient id="glassGrad" x1="0" x2="1">
+              <stop offset="0" stop-color="#fff" stop-opacity=".32"/>
+              <stop offset=".2" stop-color="#fff" stop-opacity=".08"/>
+              <stop offset=".55" stop-color="#fff" stop-opacity=".03"/>
+              <stop offset=".85" stop-color="#fff" stop-opacity=".12"/>
+              <stop offset="1" stop-color="#fff" stop-opacity=".34"/>
+            </linearGradient>
+            <linearGradient id="liquidGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#f7f9b8"/>
+              <stop offset="1" stop-color="#cfe45a"/>
+            </linearGradient>
+            <linearGradient id="baseGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#e6eeff" stop-opacity=".45"/>
+              <stop offset="1" stop-color="#b9c8e8" stop-opacity=".22"/>
+            </linearGradient>
+          </defs>
+
+          <ellipse cx="100" cy="334" rx="84" ry="7" fill="#000" opacity=".35"/>
+
+          <!-- vidro -->
+          <path d="M10,8 L190,8 L166,322 Q165,332 155,332 L45,332 Q35,332 34,322 Z" fill="url(#glassGrad)"/>
+
+          <!-- líquido (vodka + refri de limão) -->
+          <g clip-path="url(#cavityClip)">
+            <g id="liquid">
+              <rect x="0" y="36" width="200" height="240" fill="url(#liquidGrad)" opacity=".92"/>
+              <ellipse cx="100" cy="36" rx="100" ry="6" fill="#fdfed8"/>
+              <g id="bubbles" fill="#fff">
+                <circle cx="50"  cy="236" r="4"   style="animation-delay:0s"/>
+                <circle cx="78"  cy="246" r="3"   style="animation-delay:.25s"/>
+                <circle cx="100" cy="240" r="5"   style="animation-delay:.1s"/>
+                <circle cx="124" cy="248" r="3.5" style="animation-delay:.4s"/>
+                <circle cx="146" cy="236" r="4"   style="animation-delay:.18s"/>
+                <circle cx="64"  cy="200" r="2.5" style="animation-delay:.55s"/>
+                <circle cx="112" cy="210" r="3"   style="animation-delay:.33s"/>
+                <circle cx="138" cy="196" r="2.5" style="animation-delay:.62s"/>
+                <circle cx="88"  cy="180" r="3"   style="animation-delay:.47s"/>
+              </g>
+            </g>
+          </g>
+
+          <!-- fundo grosso de vidro -->
+          <path d="M35,236 Q38,258 100,260 Q162,258 165,236 L166,322 Q165,332 155,332 L45,332 Q35,332 34,322 Z" fill="url(#baseGrad)"/>
+          <ellipse cx="100" cy="294" rx="48" ry="9" fill="none" stroke="#fff" stroke-opacity=".4" stroke-width="2.5"/>
+          <ellipse cx="100" cy="294" rx="26" ry="5" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2"/>
+          <path d="M38,258 Q100,276 162,258" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2"/>
+
+          <!-- anéis -->
+          <path d="M21,150 Q100,159 179,150" fill="none" stroke="#0d1830" stroke-opacity=".55" stroke-width="4"/>
+          <path d="M21,154 Q100,163 179,154" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>
+          <path d="M24,190 Q100,199 176,190" fill="none" stroke="#0d1830" stroke-opacity=".55" stroke-width="4"/>
+          <path d="M24,194 Q100,203 176,194" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="1.5"/>
+
+          <!-- reflexos + contorno -->
+          <path d="M30,22 L50,300" stroke="#fff" stroke-opacity=".5" stroke-width="7" stroke-linecap="round"/>
+          <path d="M168,26 L154,230" stroke="#fff" stroke-opacity=".25" stroke-width="3" stroke-linecap="round"/>
+          <path d="M10,8 L190,8 L166,322 Q165,332 155,332 L45,332 Q35,332 34,322 Z" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="3" stroke-linejoin="round"/>
+          <ellipse cx="100" cy="9" rx="90" ry="6" fill="none" stroke="#fff" stroke-opacity=".85" stroke-width="3"/>
+
+          <!-- espuma -->
+          <g clip-path="url(#foamClip)">
+            <g id="foam">
+              <g class="foam-inner" fill="#fffef0">
+                <rect x="14" y="6" width="172" height="48"/>
+                <circle cx="30"  cy="4"   r="22"/>
+                <circle cx="64"  cy="-12" r="28"/>
+                <circle cx="102" cy="-20" r="32"/>
+                <circle cx="140" cy="-10" r="27"/>
+                <circle cx="172" cy="4"   r="21"/>
+                <g fill="#e9e5bf">
+                  <circle cx="52" cy="10" r="4"/><circle cx="92" cy="-6" r="5"/><circle cx="128" cy="14" r="3.5"/>
+                  <circle cx="150" cy="-4" r="3"/><circle cx="74" cy="30" r="3"/><circle cx="116" cy="36" r="4"/>
+                </g>
+              </g>
+            </g>
+          </g>
+          <path class="drip" d="M178,0 Q192,2 191,22 L187,58 Q184,70 178,58 L176,20 Z" fill="#fffef0"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="counter">
+    <div class="count-num" id="countNum">0</div>
+    <div class="count-label" id="countLabel">PORRADINHAS</div>
+  </div>
+  <div class="cool-line" id="coolLine"></div>
+
+  <button class="btn" id="drinkBtn" type="button">TOMEI UMA PORRADINHA</button>
+
+  <div class="slider" id="finishSlider">
+    <div class="slider-fill" id="sliderFill"></div>
+    <div class="slider-text">FINALIZAR POR AQUI <span class="arrows">›››</span></div>
+    <button class="slider-thumb" id="sliderThumb" type="button" aria-label="Deslize para finalizar por aqui">✓</button>
+  </div>
+</section>
+
+<!-- ============================ TELA FINAL (CARD) ============================ -->
+<section class="screen scroll" id="screen-result" hidden>
+  <article class="story-card" id="storyCard">
+    <div class="sc-head">
+      <div class="logo sc-logo" data-logo></div>
+      <div class="sc-title">PORRADINHA</div>
+    </div>
+    <div class="sc-body">
+      <div class="sc-nick" id="scNick">—</div>
+      <div class="sc-org" id="scOrg"></div>
+      <div class="sc-took">TOMOU</div>
+      <div class="sc-num-row">
+        <div class="sc-num" id="scNum">0</div>
+        <div class="sc-cup" data-icon></div>
+      </div>
+      <div class="sc-label" id="scLabel">PORRADINHAS</div>
+      <div class="sc-phrase" id="scPhrase"></div>
+    </div>
+    <footer class="sc-foot">
+      <div class="sc-post">POSTE NOS STORIES</div>
+      <div class="sc-tag">Poste seu resultado e marque a República Rapina</div>
+      <div class="sc-handle" id="scHandle"></div>
+      <div class="sc-date" id="scDate"></div>
+    </footer>
+  </article>
+
+  <div class="result-actions">
+    <button class="btn btn-white" id="toRankingBtn" type="button">🏆 VER RANKING</button>
+  </div>
+
+  <div class="undo" id="undoBox" hidden>
+    <div class="undo-text">Finalizou por engano?<small id="undoLeft">10 s para voltar</small></div>
+    <button class="btn" id="undoBtn" type="button">VOLTAR A TOMAR</button>
+    <div class="undo-bar" id="undoBar"></div>
+  </div>
+</section>
+
+<!-- ============================ RANKING ============================ -->
+<section class="screen scroll" id="screen-ranking" hidden>
+  <div class="rank-inner">
+    <div class="rank-head">
+      <div class="logo logo-sm" data-logo></div>
+      <h1 class="rank-title">🏆 RANKING DA <span>PORRADINHA</span></h1>
+    </div>
+    <p class="rank-sub">Resultados registrados neste dispositivo</p>
+    <ol class="rank-list" id="rankList"></ol>
+    <div class="rank-actions">
+      <button class="btn btn-white" id="backToResultBtn" type="button">VOLTAR AO RESULTADO</button>
+      <button class="btn btn-ghost" id="endBtn" type="button">ENCERRAR</button>
+    </div>
+  </div>
+</section>
+
+<!-- ============================ CAMADAS ============================ -->
+<div class="countdown" id="countdown" hidden><div class="cd-text" id="cdText">1</div></div>
+<div id="layer"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   PORRADINHA — v1 offline (sem backend). Tudo salvo no localStorage.
+   ===================================================================== */
+
+/* ============================== CONFIG ============================== */
+const COOLDOWN_SECONDS = 30;          // tempo mínimo entre duas Porradinhas
+const UNDO_FINISH_SECONDS = 10;       // janela para "voltar a tomar" depois de finalizar
+const INSTAGRAM_HANDLE = "@rap.rapina";
+const NICK_MAX = 20;
+const ORG_MAX = 30;
+const STORAGE_PREFIX = "porradinha.v1.";
+
+// Logo real da República Rapina. Vazio = usa o desenho SVG embutido (logoSVG).
+// Pode ser um caminho ("assets/logo-rapina.png"), uma URL ou um data URL (base64)
+// — com data URL o app continua sendo um único arquivo.
+const LOGO_SRC = "";
+
+// Mensagens especiais por número de Porradinhas.
+// important: true => abre um aviso que precisa de "ENTENDI" (em vez de um toast rápido).
+const CHECKPOINTS = {
+  1:  { text: "Começou! 🎉" },
+  5:  { text: "A noite começou a ficar interessante 👀" },
+  10: { text: "Já foram várias. Intercala com uma água também 💧" },
+  20: { text: "Esse contador já está alto. Dá uma pausa.", important: true, emoji: "✋" },
+  30: { text: "Calma aí 😳 Melhor desacelerar.", important: true, emoji: "🛑" },
+  50: { text: "Esse número está muito alto. Pare, fique com seus amigos e procure a equipe da festa se precisar.", important: true, emoji: "🤝" },
+};
+
+// Frase do card final, pela quantidade total (primeira faixa em que count <= upTo).
+const RESULT_PHRASES = [
+  { upTo: 5,        text: "Hoje foi mais tranquilo." },
+  { upTo: 15,       text: "A noite rendeu 👀" },
+  { upTo: 30,       text: "Esse contador ficou alto. Vai de água agora 💧" },
+  { upTo: Infinity, text: "Esse contador ficou muito alto. Dá uma pausa e fica com seus amigos." },
+];
+
+// RANKING LOCAL / DEMO — não existe servidor nesta versão.
+// Estes nomes são só dados iniciais de demonstração; os resultados finalizados
+// neste aparelho são somados a eles (ver RANKING). Cada celular tem o seu ranking.
+const DEFAULT_RANKING = [
+  { nick: "Sanasa",  org: "Rapina", count: 35 },
+  { nick: "Corujão", org: "Rapina", count: 32 },
+  { nick: "Canhoto", org: "Rapina", count: 29 },
+  { nick: "Caras",   org: "Rapina", count: 27 },
+  { nick: "Johnny",  org: "Rapina", count: 25 },
+];
+
+// Durações da animação (ms)
+const TIMING = { countStep: 520, word: 720, slam: 420, shake: 300, foam: 950, drink: 1050 };
+
+const COLORS = { navy: "#16274a", navyDark: "#0d1830", orange: "#ff6a13", lemon: "#e9f27a", foam: "#fffef0" };
+
+/* ============================== STATE ============================== */
+const state = {
+  profile: null,       // { nick, org }
+  session: null,       // { count, lastAt, startedAt }  — contagem em andamento
+  result: null,        // { id, nick, org, count, finishedAt } — resultado finalizado
+  localRanking: [],    // resultados finalizados neste aparelho
+  screen: "start",     // start | main | result | ranking
+  animating: false,
+};
+
+const $ = (sel) => document.querySelector(sel);
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+/* =========================== LOCAL STORAGE =========================== */
+const storage = {
+  get(key, fallback) {
+    try {
+      const raw = localStorage.getItem(STORAGE_PREFIX + key);
+      return raw == null ? fallback : JSON.parse(raw);
+    } catch (e) { return fallback; }
+  },
+  set(key, value) {
+    try {
+      if (value == null) localStorage.removeItem(STORAGE_PREFIX + key);
+      else localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+    } catch (e) { /* modo privado / sem espaço: segue só em memória */ }
+  },
+};
+
+function loadState() {
+  state.profile = storage.get("profile", null);
+  state.session = storage.get("session", null);
+  state.result = storage.get("result", null);
+  state.localRanking = storage.get("ranking", []);
+  state.screen = storage.get("screen", "start");
+  if (!Array.isArray(state.localRanking)) state.localRanking = [];
+}
+
+function saveState() {
+  storage.set("profile", state.profile);
+  storage.set("session", state.session);
+  storage.set("result", state.result);
+  storage.set("ranking", state.localRanking);
+  storage.set("screen", state.screen);
+}
+
+/* ============================== ARTE (logo + ícone) ============================== */
+// Recriação vetorial da logo da República Rapina (use LOGO_SRC para a imagem oficial).
+function logoSVG() {
+  return `
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="República Rapina">
+  <rect width="400" height="400" fill="#fff"/>
+  <polygon points="0,64 0,400 160,400" fill="#1b2a4a"/>
+  <polygon points="236,0 400,0 400,304" fill="#ff6a13"/>
+  <g font-family="Rockwell,'Roboto Slab','Bookman Old Style',Georgia,serif" font-weight="700" fill="#111" stroke="#fff" stroke-width="1.4" paint-order="stroke">
+    <text x="38" y="148" font-size="42" textLength="228" lengthAdjust="spacingAndGlyphs">REPÚBLICA</text>
+    <text x="38" y="190" font-size="42" textLength="158" lengthAdjust="spacingAndGlyphs">RAPINA</text>
+  </g>
+  <line x1="38" y1="155" x2="262" y2="155" stroke="#111" stroke-width="3"/>
+  <path fill="#111" d="M270,118 L330,113 C358,111 377,127 379,150 C380,166 372,177 362,182 C363,169 357,161 345,160 L300,160 L286,150 L270,150 Z"/>
+  <path fill="#fff" d="M298,128 L340,124 L327,135 L300,138 Z"/>
+  <g stroke="#111" stroke-width="13">
+    <line x1="214" y1="160" x2="228" y2="312"/>
+    <line x1="238" y1="160" x2="231" y2="284"/>
+    <line x1="262" y1="160" x2="242" y2="248"/>
+    <line x1="286" y1="160" x2="264" y2="212"/>
+  </g>
+</svg>`;
+}
+
+// Ícone do app: copo de Porradinha espumando, azul escuro + laranja.
+// rounded=true para favicon; false (quadrado) para PWA / tela inicial do iPhone.
+function iconSVG({ rounded = true, uid = "i" } = {}) {
+  const r = rounded ? 112 : 0;
+  return `
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="${uid}bg"><rect width="512" height="512" rx="${r}"/></clipPath>
+    <clipPath id="${uid}cav"><path d="M168,172 L344,172 L326,372 Q322,392 256,394 Q190,392 186,372 Z"/></clipPath>
+  </defs>
+  <g clip-path="url(#${uid}bg)">
+    <rect width="512" height="512" fill="${COLORS.navy}"/>
+    <polygon points="512,120 512,512 150,512" fill="${COLORS.orange}"/>
+    <polygon points="512,92 512,120 150,512 118,512" fill="#fff"/>
+  </g>
+  <ellipse cx="256" cy="452" rx="100" ry="12" fill="#000" opacity=".3"/>
+  <path d="M152,160 L360,160 L334,440 Q332,452 320,452 L192,452 Q180,452 178,440 Z" fill="#fff" fill-opacity=".2"/>
+  <g clip-path="url(#${uid}cav)">
+    <rect x="140" y="196" width="240" height="220" fill="${COLORS.lemon}"/>
+    <circle cx="220" cy="330" r="9" fill="#fff" opacity=".8"/><circle cx="286" cy="290" r="7" fill="#fff" opacity=".8"/><circle cx="252" cy="356" r="6" fill="#fff" opacity=".8"/>
+  </g>
+  <path d="M186,372 Q190,392 256,394 Q322,392 326,372 L334,440 Q332,452 320,452 L192,452 Q180,452 178,440 Z" fill="#fff" fill-opacity=".45"/>
+  <path d="M152,160 L360,160 L334,440 Q332,452 320,452 L192,452 Q180,452 178,440 Z" fill="none" stroke="#fff" stroke-width="16" stroke-linejoin="round"/>
+  <line x1="176" y1="300" x2="336" y2="300" stroke="${COLORS.navy}" stroke-width="9" opacity=".6"/>
+  <g fill="${COLORS.foam}" stroke="${COLORS.navyDark}" stroke-width="10" paint-order="stroke">
+    <path d="M150,178 C120,176 118,128 158,122 C160,80 214,70 234,98 C252,58 318,62 322,104 C352,88 396,114 372,160 C392,180 372,214 352,206 L356,260 C356,280 332,280 332,260 L330,212 Q256,222 160,206 C140,206 132,186 150,178 Z"/>
+  </g>
+  <g fill="#e2dcae"><circle cx="210" cy="150" r="9"/><circle cx="280" cy="128" r="11"/><circle cx="318" cy="176" r="7"/></g>
+</svg>`;
+}
+
+function mountArt() {
+  const logoHTML = LOGO_SRC ? `<img src="${LOGO_SRC}" alt="República Rapina">` : logoSVG();
+  document.querySelectorAll("[data-logo]").forEach((el) => { el.innerHTML = logoHTML; });
+  document.querySelectorAll("[data-icon]").forEach((el, i) => { el.innerHTML = iconSVG({ uid: "ic" + i }); });
+}
+
+// Favicon (SVG), apple-touch-icon (PNG gerado em canvas) e manifest PWA (blob).
+function setupIcons() {
+  const svgUrl = (svg) => "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  $("#favicon").setAttribute("href", svgUrl(iconSVG({ rounded: true, uid: "fav" })));
+
+  const toPNG = (size) => new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      try {
+        const c = document.createElement("canvas");
+        c.width = c.height = size;
+        c.getContext("2d").drawImage(img, 0, 0, size, size);
+        resolve(c.toDataURL("image/png"));
+      } catch (e) { resolve(null); }
+    };
+    img.onerror = () => resolve(null);
+    img.src = svgUrl(iconSVG({ rounded: false, uid: "png" }));
+  });
+
+  Promise.all([toPNG(180), toPNG(192), toPNG(512)]).then(([p180, p192, p512]) => {
+    if (p180) $("#appleIcon").setAttribute("href", p180);
+    if (!p192 || !p512) return;
+    try {
+      const base = location.href.split("#")[0];
+      const manifest = {
+        name: "PORRADINHA · República Rapina",
+        short_name: "Porradinha",
+        start_url: base,
+        scope: base.replace(/[^/]*$/, ""),
+        display: "standalone",
+        orientation: "portrait",
+        background_color: COLORS.navyDark,
+        theme_color: COLORS.navy,
+        icons: [
+          { src: p192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+          { src: p512, sizes: "512x512", type: "image/png", purpose: "any maskable" },
+        ],
+      };
+      const link = document.createElement("link");
+      link.rel = "manifest";
+      link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: "application/manifest+json" }));
+      document.head.appendChild(link);
+    } catch (e) { /* ambiente sem Blob URL: segue sem manifest */ }
+  });
+}
+
+/* ============================== PROFILE ============================== */
+function cleanText(value, max) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, max);
+}
+
+function startSession(nick, org) {
+  state.profile = { nick, org };
+  state.session = { count: 0, lastAt: null, startedAt: Date.now() };
+  state.result = null;
+  saveState();
+  go("main");
+}
+
+function onStartSubmit(event) {
+  event.preventDefault();
+  const nick = cleanText($("#inNick").value, NICK_MAX);
+  const org = cleanText($("#inOrg").value, ORG_MAX);
+  const field = $("#fieldNick");
+  if (!nick) {
+    field.classList.remove("has-error"); void field.offsetWidth; field.classList.add("has-error");
+    $("#nickError").textContent = "Coloca seu apelido pra começar.";
+    $("#inNick").focus();
+    return;
+  }
+  field.classList.remove("has-error");
+  $("#nickError").textContent = "";
+  document.activeElement && document.activeElement.blur();
+  startSession(nick, org);
+}
+
+async function changeNick() {
+  const res = await openSheet({
+    emoji: "✏️", title: "TROCAR APELIDO",
+    input: { value: state.profile.nick, placeholder: "Canhoto", max: NICK_MAX, required: "O apelido é obrigatório." },
+    buttons: [{ label: "SALVAR", value: "ok" }, { label: "CANCELAR", value: null, style: "ghost" }],
+  });
+  if (res && res.value === "ok") { state.profile.nick = res.text; saveState(); renderMain(); }
+}
+
+async function changeOrg() {
+  const res = await openSheet({
+    emoji: "🏠", title: "REPÚBLICA / ATLÉTICA / ORGANIZAÇÃO",
+    text: "Opcional — pode deixar em branco.",
+    input: { value: state.profile.org, placeholder: "Rapina", max: ORG_MAX },
+    buttons: [{ label: "SALVAR", value: "ok" }, { label: "CANCELAR", value: null, style: "ghost" }],
+  });
+  if (res && res.value === "ok") { state.profile.org = res.text; saveState(); renderMain(); }
+}
+
+/* ============================== COUNTER ============================== */
+function tryDrink() {
+  if (state.screen !== "main" || state.animating || !state.session) return;
+  if (cooldownLeft() > 0) { openCooldownSheet(); return; }
+
+  // Conta e inicia o cooldown já no toque (antes da animação) — evita toque duplo
+  // e mantém a contagem certa mesmo se a página for recarregada no meio.
+  state.session.count += 1;
+  state.session.lastAt = Date.now();
+  saveState();
+  playPorradinha(state.session.count);
+}
+
+function renderCounter(value, bump) {
+  const num = $("#countNum");
+  num.textContent = value;
+  $("#countLabel").textContent = value === 1 ? "PORRADINHA" : "PORRADINHAS";
+  if (bump) { num.classList.remove("bump"); void num.offsetWidth; num.classList.add("bump"); }
+}
+
+async function resetCounter() {
+  const res = await openSheet({
+    emoji: "🧽", title: "ZERAR CONTADOR?",
+    text: `Sua contagem de ${state.session.count} volta para 0. Não dá pra desfazer.`,
+    buttons: [{ label: "ZERAR", value: "ok", style: "danger" }, { label: "CANCELAR", value: null, style: "ghost" }],
+  });
+  if (!res || res.value !== "ok") return;
+  state.session.count = 0;
+  state.session.lastAt = null;
+  saveState();
+  renderMain();
+  setFill(1, 300);
+}
+
+/* ============================== COOLDOWN ============================== */
+function cooldownLeftMs() {
+  if (!state.session || !state.session.lastAt) return 0;
+  const left = state.session.lastAt + COOLDOWN_SECONDS * 1000 - Date.now();
+  return Math.max(0, Math.min(COOLDOWN_SECONDS * 1000, left)); // min() protege contra relógio alterado
+}
+function cooldownLeft() { return Math.ceil(cooldownLeftMs() / 1000); }
+function cooldownProgress() { return 1 - cooldownLeftMs() / (COOLDOWN_SECONDS * 1000); }
+
+function openCooldownSheet() {
+  if (navigator.vibrate) navigator.vibrate([30, 40, 30]);
+  openSheet({
+    emoji: "🍋", title: "VAI PRO FINAL DA FILA 😅",
+    text: "Porradinha é pra todo mundo aproveitar.",
+    html: `<div class="big-timer">Próxima em <b data-cooldown-left>${cooldownLeft()}</b> segundos</div>`,
+    buttons: [{ label: "BELEZA", value: "ok", style: "white" }],
+    kind: "cooldown",
+  });
+}
+
+// Atualiza tudo que depende do relógio (roda a cada 250 ms).
+function tick() {
+  if (state.screen === "main" && state.session) {
+    const left = cooldownLeft();
+    const btn = $("#drinkBtn");
+    btn.classList.toggle("is-cooling", left > 0 || state.animating);
+    $("#coolLine").innerHTML = state.animating ? "" : left > 0 ? `Próxima em <b>${left}s</b>` : "";
+    if (!state.animating) {
+      setFill(cooldownProgress(), 300); // o copo "reenche" durante o cooldown
+      $("#cupWrap").classList.toggle("ready", left === 0);
+    }
+    document.querySelectorAll("[data-cooldown-left]").forEach((el) => { el.textContent = left; });
+    if (left === 0 && layerKind() === "cooldown") closeSheet(null);
+  }
+  if (state.screen === "result") updateUndo();
+}
+
+/* ============================== CHECKPOINTS ============================== */
+function showCheckpoint(count) {
+  const cp = CHECKPOINTS[count];
+  if (!cp) return;
+  if (cp.important) {
+    openSheet({
+      emoji: cp.emoji || "💧", title: `${count} PORRADINHAS`, text: cp.text,
+      buttons: [{ label: "ENTENDI", value: "ok", style: "white" }], lockBackdrop: true,
+    });
+  } else {
+    toast(cp.text);
+  }
+}
+
+/* ============================== ANIMATIONS ============================== */
+function vibrate(pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern); } catch (e) {} }
+
+function restartClass(el, cls) {
+  el.classList.remove(cls);
+  void el.getBoundingClientRect(); // força reflow para a animação recomeçar
+  el.classList.add(cls);
+}
+
+// Nível do líquido no copo: 0 (vazio) a 1 (cheio).
+function setFill(value, ms) {
+  const liquid = $("#liquid");
+  liquid.style.transition = `transform ${Math.round(ms)}ms ${ms > 400 ? "ease-in" : "linear"}`;
+  liquid.style.setProperty("--fill", Math.max(0, Math.min(1, value)).toFixed(3));
+}
+
+// 1, 2, 3, PORRADINHA! → desce → bate na mesa → treme → borbulha → espuma → vira → volta
+async function playPorradinha(count) {
+  state.animating = true;
+  const k = matchMedia("(prefers-reduced-motion: reduce)").matches ? 0.55 : 1;
+  const wrap = $("#cupWrap"), overlay = $("#countdown"), text = $("#cdText"), impact = $("#impact");
+  wrap.classList.remove("ready");
+  tick();
+  setFill(1, 0);
+
+  overlay.hidden = false;
+  for (const n of ["1", "2", "3"]) {
+    text.className = "cd-text"; text.textContent = n;
+    restartClass(text, "pop"); vibrate(15);
+    await wait(TIMING.countStep * k);
+  }
+  text.className = "cd-text word"; text.textContent = "PORRADINHA!";
+  restartClass(text, "pop");
+  await wait(TIMING.word * k);
+  overlay.hidden = true;
+
+  restartClass(wrap, "slam");                       // copo sobe e desce com tudo
+  await wait(TIMING.slam * k);
+  wrap.classList.remove("slam");
+
+  restartClass(wrap, "shake");                      // impacto na mesa
+  restartClass(impact, "go");
+  vibrate(70);
+  wrap.classList.add("bubbling");                   // líquido borbulha
+  await wait(TIMING.shake * k);
+  wrap.classList.remove("shake");
+
+  wrap.classList.add("foamy");                      // espuma sobe e transborda
+  await wait(TIMING.foam * k);
+
+  restartClass(wrap, "drink");                      // vira o copo
+  await wait(TIMING.drink * 0.25 * k);
+  wrap.classList.remove("foamy", "bubbling");
+  setFill(0, TIMING.drink * 0.45 * k);
+  await wait(TIMING.drink * 0.75 * k);
+  wrap.classList.remove("drink");                   // volta à posição
+  impact.classList.remove("go");
+
+  state.animating = false;
+  if (state.screen !== "main") return;
+  renderCounter(count, true);
+  tick();
+  showCheckpoint(count);
+}
+
+/* ============================== UI: sheets, menu, toast ============================== */
+let sheetCtx = null; // { resolve, kind, lockBackdrop, el }
+
+// Diálogo em "bottom sheet" (fácil de usar com uma mão). Resolve { value, text } ou null.
+function openSheet(opts) {
+  if (sheetCtx) closeSheet(null);
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "overlay";
+    const sheet = document.createElement("div");
+    sheet.className = "sheet";
+    sheet.setAttribute("role", "dialog");
+    sheet.setAttribute("aria-modal", "true");
+    overlay.appendChild(sheet);
+
+    const add = (tag, cls, txt) => {
+      const el = document.createElement(tag);
+      if (cls) el.className = cls;
+      if (txt != null) el.textContent = txt;
+      sheet.appendChild(el);
+      return el;
+    };
+    if (opts.emoji) add("div", "emoji", opts.emoji);
+    if (opts.title) add("h2", "", opts.title);
+    if (opts.text) add("p", "", opts.text);
+    if (opts.html) sheet.insertAdjacentHTML("beforeend", opts.html); // só HTML interno, nunca texto do usuário
+    if (opts.node) sheet.appendChild(opts.node);
+
+    let input = null, error = null;
+    if (opts.input) {
+      input = add("input");
+      input.type = "text";
+      input.maxLength = opts.input.max || 40;
+      input.value = opts.input.value || "";
+      input.placeholder = opts.input.placeholder || "";
+      input.autocapitalize = "words";
+      input.spellcheck = false;
+      error = add("div", "field-error");
+    }
+
+    const submit = (value) => {
+      if (value == null) return closeSheet(null);
+      const txt = input ? cleanText(input.value, opts.input.max || 40) : undefined;
+      if (input && opts.input.required && !txt) {
+        error.textContent = opts.input.required;
+        input.style.animation = "shake .35s"; setTimeout(() => (input.style.animation = ""), 360);
+        input.focus();
+        return;
+      }
+      closeSheet({ value, text: txt });
+    };
+
+    const actions = add("div", "actions");
+    (opts.buttons || []).forEach((b) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn" + (b.style ? " btn-" + b.style : "");
+      btn.textContent = b.label;
+      btn.addEventListener("click", () => submit(b.value));
+      actions.appendChild(btn);
+    });
+
+    if (input) {
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") { e.preventDefault(); submit(opts.buttons[0].value); }
+      });
+      input.addEventListener("input", () => { error.textContent = ""; });
+    }
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay && !opts.lockBackdrop) closeSheet(null);
+    });
+
+    sheetCtx = { resolve, kind: opts.kind || null, lockBackdrop: !!opts.lockBackdrop, el: overlay };
+    $("#layer").appendChild(overlay);
+    if (input) setTimeout(() => input.focus(), 60);
+  });
+}
+
+function closeSheet(result) {
+  if (!sheetCtx) return;
+  const ctx = sheetCtx;
+  sheetCtx = null;
+  ctx.el.remove();
+  ctx.resolve(result);
+}
+
+function layerKind() { return sheetCtx ? sheetCtx.kind : null; }
+
+let toastTimer = null;
+function toast(message, ms = 4200) {
+  document.querySelectorAll(".toast").forEach((t) => t.remove());
+  const el = document.createElement("div");
+  el.className = "toast";
+  el.setAttribute("role", "status");
+  el.textContent = message;
+  const hide = () => { el.classList.add("out"); setTimeout(() => el.remove(), 260); };
+  el.addEventListener("click", hide);
+  document.body.appendChild(el);
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hide, ms);
+}
+
+function openMenu() {
+  if (state.animating) return;
+  const list = document.createElement("div");
+  list.className = "menu-list";
+  [
+    ["✏️", "Trocar apelido", changeNick],
+    ["🏠", "Alterar República / Atlética / Organização", changeOrg],
+    ["🧽", "Zerar contador", resetCounter, "danger"],
+    ["🏁", "Finalizar por aqui", confirmFinish],
+  ].forEach(([icon, label, action, cls]) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "menu-item" + (cls ? " " + cls : "");
+    const i = document.createElement("span"); i.className = "mi-icon"; i.textContent = icon;
+    const t = document.createElement("span"); t.textContent = label;
+    item.append(i, t);
+    item.addEventListener("click", () => { closeSheet(null); action(); });
+    list.appendChild(item);
+  });
+  openSheet({ title: "MENU", node: list, buttons: [{ label: "FECHAR", value: null, style: "ghost" }] });
+}
+
+/* ============================== FINALIZAR (slider + confirmação) ============================== */
+function initSlider() {
+  const slider = $("#finishSlider"), thumb = $("#sliderThumb"), fill = $("#sliderFill");
+  const PAD = 4;
+  let dragging = false, pointerId = null, startX = 0, x = 0, max = 0;
+
+  const setX = (value) => {
+    x = Math.max(0, Math.min(max, value));
+    thumb.style.transform = `translateX(${x}px)`;
+    fill.style.width = (x ? x + thumb.offsetWidth + PAD : 0) + "px";
+    slider.style.setProperty("--p", max ? (x / max).toFixed(3) : 0);
+  };
+
+  thumb.addEventListener("pointerdown", (e) => {
+    if (state.animating) return;
+    e.preventDefault();
+    dragging = true;
+    pointerId = e.pointerId;
+    slider.classList.remove("returning", "nudge");
+    max = slider.clientWidth - thumb.offsetWidth - PAD * 2;
+    startX = e.clientX - x;
+    try { thumb.setPointerCapture(e.pointerId); } catch (err) {}
+  });
+  thumb.addEventListener("pointermove", (e) => {
+    if (dragging && e.pointerId === pointerId) setX(e.clientX - startX);
+  });
+  const end = async () => {
+    if (!dragging) return;
+    dragging = false;
+    const reachedEnd = max > 0 && x >= max * 0.9;
+    slider.classList.add("returning");
+    if (reachedEnd) {
+      setX(max);
+      vibrate(30);
+      await confirmFinish();
+    }
+    setX(0);
+  };
+  thumb.addEventListener("pointerup", end);
+  thumb.addEventListener("pointercancel", end);
+  thumb.addEventListener("lostpointercapture", end);
+
+  // Toque sem arrastar => só uma dica
+  slider.addEventListener("click", () => {
+    if (x !== 0 || dragging || sheetCtx) return;
+    restartClass(slider, "nudge");
+    toast("Arraste até o fim para finalizar ›››", 2200);
+  });
+  thumb.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); confirmFinish(); }
+  });
+}
+
+async function confirmFinish() {
+  if (state.animating || !state.session || state.screen !== "main") return;
+  const n = state.session.count;
+  const res = await openSheet({
+    emoji: "🏁",
+    title: "FINALIZAR SUA CONTAGEM?",
+    text: `Parou mesmo de tomar Porradinha por hoje? Seu resultado (${n} ${n === 1 ? "Porradinha" : "Porradinhas"}) vai para o card final e para o ranking.`,
+    buttons: [
+      { label: "SIM, PAREI POR HOJE", value: "ok" },
+      { label: "AINDA NÃO", value: null, style: "ghost" },
+    ],
+  });
+  if (res && res.value === "ok") finishSession();
+}
+
+/* ============================== RESULT ============================== */
+function finishSession() {
+  const result = {
+    id: "u" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+    nick: state.profile.nick,
+    org: state.profile.org || "",
+    count: state.session.count,
+    finishedAt: Date.now(),
+  };
+  state.result = result;
+  state.localRanking.push({ ...result }); // entra no ranking local
+  saveState();
+  go("result");
+}
+
+function resultPhrase(count) {
+  const tier = RESULT_PHRASES.find((p) => count <= p.upTo) || RESULT_PHRASES[RESULT_PHRASES.length - 1];
+  return tier.text;
+}
+
+function renderResult() {
+  const r = state.result;
+  if (!r) return;
+  $("#scNick").textContent = r.nick;
+  const org = $("#scOrg");
+  org.textContent = r.org;
+  org.hidden = !r.org;
+  const num = $("#scNum");
+  num.textContent = r.count;
+  num.classList.toggle("d3", String(r.count).length >= 3);
+  $("#scLabel").textContent = r.count === 1 ? "PORRADINHA" : "PORRADINHAS";
+  $("#scPhrase").textContent = resultPhrase(r.count);
+  $("#scHandle").textContent = INSTAGRAM_HANDLE;
+  $("#scDate").textContent = new Date(r.finishedAt).toLocaleDateString("pt-BR");
+  updateUndo();
+}
+
+// "Voltar a tomar": disponível por UNDO_FINISH_SECONDS após finalizar (vale mesmo recarregando).
+function undoLeftMs() {
+  if (!state.result) return 0;
+  const left = state.result.finishedAt + UNDO_FINISH_SECONDS * 1000 - Date.now();
+  return Math.max(0, Math.min(UNDO_FINISH_SECONDS * 1000, left));
+}
+
+function updateUndo() {
+  const box = $("#undoBox");
+  const ms = undoLeftMs();
+  const show = ms > 0 && !!state.session;
+  box.hidden = !show;
+  if (!show) return;
+  $("#undoBar").style.width = ((ms / (UNDO_FINISH_SECONDS * 1000)) * 100).toFixed(1) + "%";
+  $("#undoLeft").textContent = `${Math.ceil(ms / 1000)} s para voltar`;
+}
+
+function undoFinish() {
+  if (!state.result || !state.session || undoLeftMs() <= 0) return;
+  const id = state.result.id;
+  state.localRanking = state.localRanking.filter((e) => e.id !== id); // tira do ranking
+  state.result = null;
+  saveState();
+  go("main");
+  toast("Contagem reaberta de onde parou.", 2600);
+}
+
+/* ============================== RANKING ============================== */
+// RANKING LOCAL / DEMO: DEFAULT_RANKING + resultados finalizados neste aparelho.
+// Não sincroniza com ninguém — numa versão com backend, trocar getRanking() pela API.
+function getRanking() {
+  const demo = DEFAULT_RANKING.map((e, i) => ({
+    id: "demo-" + i, nick: e.nick, org: e.org || "", count: e.count, finishedAt: 0, demo: true,
+  }));
+  const all = [...demo, ...state.localRanking].sort(
+    (a, b) => b.count - a.count || (a.finishedAt || 0) - (b.finishedAt || 0)
+  );
+  let prevCount = null, prevPos = 0;
+  return all.map((e, i) => {
+    const pos = e.count === prevCount ? prevPos : i + 1; // empates dividem a posição
+    prevCount = e.count;
+    prevPos = pos;
+    return { ...e, pos };
+  });
+}
+
+const MEDALS = { 1: "🥇", 2: "🥈", 3: "🥉" };
+
+function renderRanking() {
+  const list = $("#rankList");
+  list.innerHTML = "";
+  const meId = state.result ? state.result.id : null;
+  let dividerAdded = false;
+
+  getRanking().forEach((e) => {
+    if (e.pos > 3 && !dividerAdded) {
+      dividerAdded = true;
+      const d = document.createElement("li");
+      d.className = "rank-divider";
+      d.textContent = "DEMAIS RESULTADOS";
+      list.appendChild(d);
+    }
+    const isMe = e.id === meId;
+    const li = document.createElement("li");
+    li.className = "rank-row" + (e.pos <= 3 ? " p" + e.pos : "") + (isMe ? " me" : "");
+
+    const pos = document.createElement("div");
+    pos.className = "rank-pos";
+    if (e.pos <= 3) pos.innerHTML = `<span class="rank-medal">${MEDALS[e.pos]}</span><span class="rank-place">${e.pos}º LUGAR</span>`;
+    else pos.textContent = e.pos + "º";
+
+    const info = document.createElement("div");
+    info.className = "rank-info";
+    const nick = document.createElement("div");
+    nick.className = "rank-nick";
+    nick.textContent = e.nick;
+    const org = document.createElement("div");
+    org.className = "rank-org";
+    if (isMe) {
+      const tag = document.createElement("span");
+      tag.className = "you-tag";
+      tag.textContent = "VOCÊ";
+      org.appendChild(tag);
+    }
+    org.appendChild(document.createTextNode(e.org || "—"));
+    info.append(nick, org);
+
+    const qty = document.createElement("div");
+    qty.className = "rank-qty";
+    qty.textContent = e.count;
+    const small = document.createElement("small");
+    small.textContent = e.count === 1 ? "Porradinha" : "Porradinhas";
+    qty.appendChild(small);
+
+    li.append(pos, info, qty);
+    list.appendChild(li);
+  });
+
+  $("#backToResultBtn").hidden = !state.result;
+  const me = list.querySelector(".me");
+  if (me) requestAnimationFrame(() => {
+    if (me.getBoundingClientRect().bottom > window.innerHeight - 170) me.scrollIntoView({ block: "center" });
+  });
+}
+
+/* ============================== NAVIGATION ============================== */
+const SCREENS = ["start", "main", "result", "ranking"];
+
+function go(screen) {
+  if (screen === "main" && (!state.profile || !state.session)) screen = "start";
+  if (screen === "result" && !state.result) screen = state.session ? "main" : "start";
+  state.screen = screen;
+  storage.set("screen", screen);
+  if (sheetCtx) closeSheet(null);
+  SCREENS.forEach((s) => { $("#screen-" + s).hidden = s !== screen; });
+  $("#screen-" + screen).scrollTop = 0;
+  if (screen === "main") renderMain();
+  if (screen === "result") renderResult();
+  if (screen === "ranking") renderRanking();
+  tick();
+}
+
+function renderMain() {
+  $("#mainNick").textContent = state.profile.nick;
+  const org = $("#mainOrg");
+  org.textContent = state.profile.org;
+  org.hidden = !state.profile.org;
+  if (!state.animating) {
+    renderCounter(state.session.count, false);
+    setFill(cooldownProgress(), 0);
+  }
+}
+
+// ENCERRAR: volta ao início. O histórico do ranking local é mantido.
+function endAll() {
+  state.profile = null;
+  state.session = null;
+  state.result = null;
+  saveState();
+  $("#inNick").value = "";
+  $("#inOrg").value = "";
+  go("start");
+}
+
+function init() {
+  loadState();
+  mountArt();
+  setupIcons();
+  initSlider();
+
+  $("#startForm").addEventListener("submit", onStartSubmit);
+  $("#inNick").addEventListener("input", () => {
+    $("#fieldNick").classList.remove("has-error");
+    $("#nickError").textContent = "";
+  });
+  $("#inNick").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); $("#inOrg").focus(); }
+  });
+  $("#drinkBtn").addEventListener("click", tryDrink);
+  $("#cupPos").addEventListener("click", tryDrink);
+  $("#cupPos").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); tryDrink(); }
+  });
+  $("#menuBtn").addEventListener("click", openMenu);
+  $("#toRankingBtn").addEventListener("click", () => go("ranking"));
+  $("#backToResultBtn").addEventListener("click", () => go("result"));
+  $("#endBtn").addEventListener("click", endAll);
+  $("#undoBtn").addEventListener("click", undoFinish);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && sheetCtx && !sheetCtx.lockBackdrop) closeSheet(null);
+  });
+  document.addEventListener("visibilitychange", tick);
+
+  // Retoma de onde parou (atualizar a página não perde nada)
+  let screen = "start";
+  if (state.result) screen = state.screen === "ranking" ? "ranking" : "result";
+  else if (state.profile && state.session) screen = "main";
+  go(screen);
+  setInterval(tick, 250);
+}
+
+init();
+</script>
+</body>
+</html>
